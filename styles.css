@@ -1,0 +1,546 @@
+/* ============================================================================
+   Stitch Editorial Design System CSS
+   Task 7: CSS Styling for Streamlit frontend
+
+   Overrides Streamlit's default styling and implements the Stitch Editorial
+   Enterprise Blend design system with sharp editorial aesthetics.
+   ============================================================================ */
+
+/* ============================================================================
+   1. HIDE STREAMLIT CHROME
+   ============================================================================ */
+
+/* Hide the Streamlit hamburger menu */
+button[kind="header"] {
+  display: none !important;
+}
+
+/* Hide the main header */
+[data-testid="stHeader"] {
+  display: none !important;
+}
+
+/* Hide the footer */
+footer {
+  display: none !important;
+}
+
+/* Hide Streamlit decorations */
+[data-testid="stDecoration"] {
+  display: none !important;
+}
+
+/* Remove default padding from main container */
+.main {
+  padding: 0 !important;
+}
+
+/* ============================================================================
+   2. IMPORT FONTS
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Switzer:wght@400;500;600;700&display=swap');
+
+/* ============================================================================
+   3. CSS VARIABLES (Design Tokens)
+   ============================================================================ */
+
+:root {
+  --primary: #1E1B4B;
+  --background: #F9FAFB;
+  --surface: #FFFFFF;
+  --text: #111827;
+  --muted: #6B7280;
+  --accent: #059669;
+  --border: #E5E7EB;
+  --shadow: 0 20px 40px -10px rgba(30, 27, 75, 0.05);
+  --radius: 0px;
+
+  /* Typography */
+  --serif-font: 'Newsreader', serif;
+  --sans-font: 'Switzer', sans-serif;
+
+  /* Text sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+}
+
+/* ============================================================================
+   4. BASE STYLES
+   ============================================================================ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--sans-font);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+/* Headings use serif font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--serif-font);
+  color: var(--primary);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: var(--text-4xl);
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: var(--text-3xl);
+  margin-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: var(--text-2xl);
+  margin-bottom: 0.5rem;
+}
+
+h4 {
+  font-size: var(--text-xl);
+  margin-bottom: 0.5rem;
+}
+
+p {
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+}
+
+/* ============================================================================
+   5. MAIN CARD CONTAINER
+   ============================================================================ */
+
+.main > .block-container {
+  max-width: 100%;
+  padding: 2rem;
+  background-color: var(--surface);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  margin: 0;
+}
+
+/* Full-bleed main container */
+.main {
+  background-color: var(--background);
+}
+
+/* ============================================================================
+   6. TITLE AND CAPTIONS
+   ============================================================================ */
+
+[data-testid="stTitle"] {
+  font-family: var(--serif-font);
+  color: var(--primary);
+  font-size: var(--text-4xl);
+  font-weight: 700;
+}
+
+[data-testid="stCaption"] {
+  font-family: var(--sans-font);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* ============================================================================
+   7. PRIMARY BUTTON
+   ============================================================================ */
+
+button[kind="primary"] {
+  background-color: var(--primary) !important;
+  color: var(--surface) !important;
+  border: none !important;
+  padding: 0.75rem 1.5rem !important;
+  font-family: var(--sans-font) !important;
+  font-size: var(--text-base) !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+button[kind="primary"]:hover {
+  background-color: #16153a !important;
+  box-shadow: var(--shadow) !important;
+}
+
+button[kind="primary"]:active {
+  transform: scale(0.98) !important;
+}
+
+/* ============================================================================
+   8. SECONDARY BUTTON
+   ============================================================================ */
+
+button[kind="secondary"] {
+  background-color: transparent !important;
+  color: var(--primary) !important;
+  border: 1px solid var(--border) !important;
+  padding: 0.75rem 1.5rem !important;
+  font-family: var(--sans-font) !important;
+  font-size: var(--text-base) !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+button[kind="secondary"]:hover {
+  background-color: var(--background);
+  border-color: var(--primary) !important;
+}
+
+/* ============================================================================
+   9. FILE UPLOADER STYLING (Dashed Drop-zone)
+   ============================================================================ */
+
+[data-testid="stFileUploadDropzone"] {
+  border: 2px dashed var(--border) !important;
+  border-radius: var(--radius) !important;
+  background-color: var(--background) !important;
+  padding: 2rem !important;
+}
+
+[data-testid="stFileUploadDropzone"]:hover {
+  border-color: var(--primary) !important;
+  background-color: rgba(30, 27, 75, 0.02) !important;
+}
+
+.uploadedFile {
+  background-color: var(--background) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  font-family: var(--sans-font);
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+/* ============================================================================
+   10. TEXT INPUT STYLING (Underline style)
+   ============================================================================ */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea {
+  font-family: var(--sans-font) !important;
+  font-size: var(--text-base) !important;
+  color: var(--text) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 0.75rem 0.5rem !important;
+  background-color: transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+  outline: none !important;
+  border-bottom-color: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder,
+textarea::placeholder {
+  color: var(--muted) !important;
+  opacity: 0.7;
+}
+
+/* ============================================================================
+   11. LABELS AND CAPTIONS
+   ============================================================================ */
+
+label {
+  font-family: var(--sans-font);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.stLabel {
+  color: var(--text) !important;
+  font-family: var(--sans-font) !important;
+  font-weight: 600 !important;
+}
+
+/* ============================================================================
+   12. SUCCESS STATES
+   ============================================================================ */
+
+[data-testid="stSuccess"] {
+  background-color: rgba(5, 150, 105, 0.1) !important;
+  border-left: 4px solid var(--accent) !important;
+  border-radius: var(--radius) !important;
+  padding: 1rem !important;
+  font-family: var(--sans-font);
+}
+
+[data-testid="stSuccess"] p {
+  color: var(--accent) !important;
+  margin: 0 !important;
+}
+
+/* ============================================================================
+   13. ERROR STATES
+   ============================================================================ */
+
+[data-testid="stError"] {
+  background-color: rgba(220, 38, 38, 0.1) !important;
+  border-left: 4px solid #DC2626 !important;
+  border-radius: var(--radius) !important;
+  padding: 1rem !important;
+  font-family: var(--sans-font);
+}
+
+[data-testid="stError"] p {
+  color: #DC2626 !important;
+  margin: 0 !important;
+}
+
+/* ============================================================================
+   14. WARNING STATES
+   ============================================================================ */
+
+[data-testid="stWarning"] {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  border-left: 4px solid #F59E0B !important;
+  border-radius: var(--radius) !important;
+  padding: 1rem !important;
+  font-family: var(--sans-font);
+}
+
+[data-testid="stWarning"] p {
+  color: #F59E0B !important;
+  margin: 0 !important;
+}
+
+/* ============================================================================
+   15. INFO STATES
+   ============================================================================ */
+
+[data-testid="stInfo"] {
+  background-color: rgba(30, 27, 75, 0.1) !important;
+  border-left: 4px solid var(--primary) !important;
+  border-radius: var(--radius) !important;
+  padding: 1rem !important;
+  font-family: var(--sans-font);
+}
+
+[data-testid="stInfo"] p {
+  color: var(--primary) !important;
+  margin: 0 !important;
+}
+
+/* ============================================================================
+   16. PROGRESS BARS
+   ============================================================================ */
+
+[data-testid="stProgress"] progress {
+  background-color: var(--border) !important;
+  border-radius: var(--radius) !important;
+  height: 4px;
+}
+
+[data-testid="stProgress"] progress::-webkit-progress-bar {
+  background-color: var(--border) !important;
+  border-radius: var(--radius) !important;
+}
+
+[data-testid="stProgress"] progress::-webkit-progress-value {
+  background-color: var(--accent) !important;
+  border-radius: var(--radius) !important;
+}
+
+[data-testid="stProgress"] progress::-moz-progress-bar {
+  background-color: var(--accent) !important;
+  border-radius: var(--radius) !important;
+}
+
+/* ============================================================================
+   17. SPINNERS
+   ============================================================================ */
+
+.spinner {
+  border-color: var(--border) !important;
+  border-top-color: var(--primary) !important;
+}
+
+[data-testid="stSpinner"] {
+  color: var(--primary) !important;
+}
+
+/* ============================================================================
+   18. STREAMLIT CONTAINER & COLUMNS
+   ============================================================================ */
+
+[data-testid="stVerticalBlock"] {
+  gap: 1rem;
+}
+
+[data-testid="stHorizontalBlock"] {
+  gap: 1rem;
+}
+
+/* ============================================================================
+   19. SELECTBOX & DROPDOWN
+   ============================================================================ */
+
+[data-testid="stSelectbox"] select {
+  font-family: var(--sans-font) !important;
+  color: var(--text) !important;
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 0.75rem !important;
+}
+
+[data-testid="stSelectbox"] select:focus {
+  border-color: var(--primary) !important;
+  outline: none !important;
+}
+
+/* ============================================================================
+   20. RADIO BUTTONS & CHECKBOXES
+   ============================================================================ */
+
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--primary) !important;
+  cursor: pointer !important;
+}
+
+/* ============================================================================
+   21. DIVIDER
+   ============================================================================ */
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* ============================================================================
+   22. METRIC CARDS
+   ============================================================================ */
+
+[data-testid="stMetric"] {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 1.5rem !important;
+  box-shadow: var(--shadow) !important;
+}
+
+[data-testid="stMetricLabel"] {
+  font-family: var(--sans-font) !important;
+  font-size: var(--text-sm) !important;
+  color: var(--muted) !important;
+  font-weight: 600 !important;
+}
+
+[data-testid="stMetricValue"] {
+  font-family: var(--sans-font) !important;
+  font-size: var(--text-2xl) !important;
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+}
+
+/* ============================================================================
+   23. EXPANDER / DETAILS
+   ============================================================================ */
+
+[data-testid="stExpander"] {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  background-color: var(--surface) !important;
+}
+
+[data-testid="stExpanderDetails"] {
+  background-color: var(--background) !important;
+  padding: 1rem !important;
+}
+
+/* ============================================================================
+   24. TABS
+   ============================================================================ */
+
+[data-testid="stTabs"] [role="tab"] {
+  font-family: var(--sans-font) !important;
+  color: var(--muted) !important;
+  border-bottom: 2px solid transparent !important;
+  padding: 0.75rem 1.5rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-testid="stTabs"] [role="tab"][aria-selected="true"] {
+  color: var(--primary) !important;
+  border-bottom-color: var(--primary) !important;
+}
+
+[data-testid="stTabs"] [role="tab"]:hover {
+  color: var(--text) !important;
+}
+
+/* ============================================================================
+   25. TABLE
+   ============================================================================ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--sans-font);
+  margin: 1rem 0;
+}
+
+thead {
+  background-color: var(--background);
+  border-bottom: 2px solid var(--border);
+}
+
+th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: var(--sans-font);
+}
+
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+tbody tr:hover {
+  background-color: var(--background);
+}
+
+/* ============================================================================
+   END OF STITCH EDITORIAL DESIGN SYSTEM CSS
+   ============================================================================ */
