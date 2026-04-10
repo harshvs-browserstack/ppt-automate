@@ -13,15 +13,19 @@ load_dotenv()
 
 @dataclass
 class Config:
-    """Configuration dataclass for the application."""
+    """Configuration dataclass for the application.
+
+    Note: original_slides_id is optional (defaults to empty string if not provided).
+    """
     gemini_api_key: str
     model_id: str
     gas_web_app_url: str
     gdrive_credentials_path: str
-    original_slides_id: str
     folder_drive_id: str
     slides_batch_size: int
     research_files_folder_id: str
+    original_slides_id: str = ""
+    power_user_mode: bool = False
     google_service_account_email: str = ""
 
 
@@ -33,13 +37,14 @@ def get_config() -> Config:
     - GEMINI_API_KEY
     - GAS_WEB_APP_URL
     - GDRIVE_CREDENTIALS_PATH
-    - ORIGINAL_SLIDES_ID
     - FOLDER_DRIVE_ID
     - RESEARCH_FILES_FOLDER_ID
 
     Optional variables (with defaults):
     - GEMINI_MODEL_ID (default: "gemini-2.5-flash")
     - SLIDES_BATCH_SIZE (default: 5)
+    - ORIGINAL_SLIDES_ID (default: "")
+    - POWER_USER_MODE (default: false)
 
     Returns:
         Config: Validated configuration dataclass
@@ -59,9 +64,10 @@ def get_config() -> Config:
         model_id=os.getenv("GEMINI_MODEL_ID", "gemini-2.5-flash"),
         gas_web_app_url=require("GAS_WEB_APP_URL"),
         gdrive_credentials_path=require("GDRIVE_CREDENTIALS_PATH"),
-        original_slides_id=require("ORIGINAL_SLIDES_ID"),
         folder_drive_id=require("FOLDER_DRIVE_ID"),
         slides_batch_size=int(os.getenv("SLIDES_BATCH_SIZE", "5")),
         research_files_folder_id=require("RESEARCH_FILES_FOLDER_ID"),
+        original_slides_id=os.getenv("ORIGINAL_SLIDES_ID", ""),
+        power_user_mode=os.getenv("POWER_USER_MODE", "").lower() == "true",
         google_service_account_email=os.getenv("GOOGLE_SERVICE_ACCOUNT_EMAIL", ""),
     )

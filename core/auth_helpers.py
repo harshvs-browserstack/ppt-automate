@@ -9,11 +9,12 @@ import gspread
 _SCOPES = [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/presentations.readonly",
 ]
 
 
 def get_credentials(credentials_path: str):
-    """Return service account credentials with Drive + Sheets scopes."""
+    """Return service account credentials with Drive + Sheets + Slides scopes."""
     return service_account.Credentials.from_service_account_file(
         credentials_path, scopes=_SCOPES
     )
@@ -35,3 +36,9 @@ def get_gspread_client(credentials_path: str) -> gspread.Client:
     """Return an authenticated gspread client."""
     creds = get_credentials(credentials_path)
     return gspread.authorize(creds)
+
+
+def get_slides_service(credentials_path: str):
+    """Return an authenticated Google Slides v1 service client."""
+    creds = get_credentials(credentials_path)
+    return build("slides", "v1", credentials=creds)
