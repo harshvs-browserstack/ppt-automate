@@ -89,30 +89,17 @@ elif st.session_state.app_state == "loading":
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    status_container = st.empty()
-    progress_bar = st.progress(0)
+    status_label = st.empty()
+    progress_bar = st.progress(0.0)
+    sub_label = st.empty()
 
-    steps = [
-        (0.05, "Cleaning up previous run..."),
-        (0.15, "Configuring template settings..."),
-        (0.25, "Generating template structure..."),
-        (0.35, "Fetching configuration IDs..."),
-        (0.45, "Uploading PDF to AI..."),
-        (0.55, "Loading style map..."),
-        (0.65, "Generating slide content with AI..."),
-        (0.85, "Uploading content to Google Sheets..."),
-        (0.95, "Populating Google Slides..."),
-    ]
-
-    step_iter = iter(steps)
-
-    def on_status(msg: str):
-        try:
-            progress, label = next(step_iter)
-            progress_bar.progress(progress)
-            status_container.markdown(f"**{label}**")
-        except StopIteration:
-            pass
+    def on_status(message: str, progress: float, sub: str = None):
+        status_label.markdown(f"**{message}**")
+        progress_bar.progress(min(progress, 1.0))
+        if sub:
+            sub_label.caption(sub)
+        else:
+            sub_label.empty()
 
     try:
         from core.config import get_config
@@ -131,7 +118,8 @@ elif st.session_state.app_state == "loading":
         )
 
         progress_bar.progress(1.0)
-        status_container.markdown("**Done!**")
+        status_label.markdown("**Done!**")
+        sub_label.empty()
 
         st.session_state.final_url = final_url
         st.session_state.app_state = "success"

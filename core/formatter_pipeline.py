@@ -173,19 +173,36 @@ async def _generate_for_slide_async(
     model_id: str,
     competitor: str,
     template_view_pdf_name: str,
+    max_retries: int = 3,
 ) -> Tuple[int, List[Dict], pd.DataFrame]:
-    """Generate content for a single slide asynchronously using Gemini."""
+    """Generate content for a single slide asynchronously using Gemini.
+    Retries on transient 503/429 errors with exponential backoff.
+    """
     prompt_text = create_slide_generation_prompt(
         slide_elements_json=slide_df.to_dict("records"),
         competitor=competitor,
         template_view_pdf_name=template_view_pdf_name,
     )
-    response = await client_genai.aio.models.generate_content(
-        model=model_id,
-        contents=context_files + [prompt_text],
-        config={"response_mime_type": "application/json", "temperature": 0.3},
-    )
-    return (slide_number, json.loads(response.text), slide_df)
+    last_exc = None
+    for attempt in range(max_retries):
+        try:
+            response = await client_genai.aio.models.generate_content(
+                model=model_id,
+                contents=context_files + [prompt_text],
+                config={"response_mime_type": "application/json", "temperature": 0.3},
+            )
+            return (slide_number, json.loads(response.text), slide_df)
+        except Exception as e:
+            last_exc = e
+            msg = str(e)
+            # Retry only on transient overload / rate-limit errors
+            if "503" in msg or "429" in msg or "UNAVAILABLE" in msg or "RESOURCE_EXHAUSTED" in msg:
+                wait = 5 * (2 ** attempt)  # 5s, 10s, 20s
+                print(f"   -> Slide {slide_number} transient error (attempt {attempt + 1}/{max_retries}), retrying in {wait}s: {e}")
+                await asyncio.sleep(wait)
+            else:
+                raise  # Non-transient error — propagate immediately
+    raise last_exc
 
 
 # ============================================================================
@@ -200,7 +217,7 @@ async def run_ai_content_population(
     config: Config,
     excluded_slide_numbers: Optional[List[int]] = None,
     template_view_pdf_name: Optional[str] = None,
-    on_status: Optional[Callable] = None,
+    on_status: Optional[Callable[[str, float, Optional[str]], None]] = None,
 ) -> str:
     """
     Main async orchestrator for the entire pipeline.
@@ -242,7 +259,7 @@ async def run_ai_content_population(
 
             # Step 1: Run destructor to reset Apps Script properties
             if on_status:
-                on_status("Running destructor...")
+                on_status("Setting up...", 0.05)
             print("\n[1/7] Running destructor...")
             r = await client_httpx.get(
                 f"{config.gas_web_app_url}?action=run&mode=destructor",
@@ -269,7 +286,7 @@ async def run_ai_content_population(
 
             # Step 2: Run template generation
             if on_status:
-                on_status("Generating template...")
+                on_status("Generating template...", 0.10)
             print("[2/7] Generating template...")
             r = await client_httpx.get(
                 f"{config.gas_web_app_url}?action=run&mode=template",
@@ -283,7 +300,7 @@ async def run_ai_content_population(
 
             # Step 3: Fetch Apps Script config properties (with retries — properties may not be ready immediately)
             if on_status:
-                on_status("Fetching configuration...")
+                on_status("Fetching configuration...", 0.25)
             print("[3/7] Fetching configuration...")
             stylemap_file_id = None
             content_sheet_id = None
@@ -307,7 +324,7 @@ async def run_ai_content_population(
 
             # Step 4: Upload PDF to Gemini and load style map
             if on_status:
-                on_status("Uploading documents...")
+                on_status("Uploading & preparing...", 0.32)
             print("[4/6] Uploading documents and loading style map...")
             uploaded_files = _upload_and_wait_for_files(client_genai, [temp_pdf])
             context_files = [
@@ -330,8 +347,6 @@ async def run_ai_content_population(
             stylemap_df = pd.DataFrame(stylemap_data)
 
             # Step 5: Generate slide content asynchronously
-            if on_status:
-                on_status("Generating content...")
             print("[5/6] Generating slide content (async batches)...")
 
             # Group by slide number and generate in batches
@@ -340,10 +355,14 @@ async def run_ai_content_population(
 
             # Filter out excluded slides
             slides_to_generate = [s for s in unique_slides if s not in excluded_slide_numbers]
+            total_slides = len(slides_to_generate)
+            GENERATION_START = 0.45
+            GENERATION_END = 0.85
 
             all_ai_results = {}
-            with tqdm(total=len(slides_to_generate), desc="Slides generated") as pbar:
-                for i in range(0, len(slides_to_generate), config.slides_batch_size):
+            completed = 0
+            with tqdm(total=total_slides, desc="Slides generated") as pbar:
+                for i in range(0, total_slides, config.slides_batch_size):
                     batch = slides_to_generate[i:i + config.slides_batch_size]
                     tasks = []
                     for slide_num in batch:
@@ -359,16 +378,25 @@ async def run_ai_content_population(
                         )
                         tasks.append(task)
 
-                    batch_results = await asyncio.gather(*tasks)
-                    for slide_num, ai_output, _ in batch_results:
-                        all_ai_results[slide_num] = ai_output
+                    batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+                    for slide_num, result in zip(batch, batch_results):
+                        if isinstance(result, Exception):
+                            print(f"   -> Slide {slide_num} failed after retries, using original content: {result}")
+                            all_ai_results[slide_num] = slide_groups.get_group(slide_num).to_dict("records")
+                        else:
+                            _, ai_output, _ = result
+                            all_ai_results[slide_num] = ai_output
+                        completed += 1
                         pbar.update(1)
+                        if on_status:
+                            frac = GENERATION_START + (completed / total_slides) * (GENERATION_END - GENERATION_START)
+                            on_status("Generating slides...", frac, f"Slide {completed} / {total_slides}")
 
             print(f"   -> Generated content for {len(all_ai_results)} slides")
 
             # Step 6: Merge results and write to sheet via GAS proxy
             if on_status:
-                on_status("Writing to sheet...")
+                on_status("Writing to sheet...", 0.87)
             print("[6/6] Writing results to Google Sheet via GAS proxy...")
 
             # Flatten all AI results for merging
@@ -418,7 +446,7 @@ async def run_ai_content_population(
 
             # Step 7: Run final generation to populate slides
             if on_status:
-                on_status("Populating slides...")
+                on_status("Populating slides...", 0.93)
             print("\n[7/7] Running final population...")
             r = await client_httpx.get(
                 f"{config.gas_web_app_url}?action=run&mode=slides",
@@ -437,7 +465,7 @@ async def run_ai_content_population(
                 raise Exception(f"GAS returned no URL. Full response: {final_response}")
 
             if on_status:
-                on_status("Complete!")
+                on_status("Complete!", 1.0)
             print(f"\n✓ Pipeline complete!")
             print(f"   -> Final URL: {final_url}")
 
