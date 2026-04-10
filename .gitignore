@@ -52,3 +52,6 @@ htmlcov/
 tuning-machines-*.json
 *.key
 *.pem
+
+/stitch/
+battle-card-1-c2c0bf15e8fa.json

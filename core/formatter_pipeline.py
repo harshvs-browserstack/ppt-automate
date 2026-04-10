@@ -142,7 +142,7 @@ async def _fetch_apps_script_configs(
     """Fetch configuration properties from Google Apps Script asynchronously."""
     keys = ["STYLEMAP_FILE_ID", "CONTENT_SHEET_ID", "STYLEMAP_FILE_ADDRESS"]
     tasks = [
-        client_httpx.get(f"{script_url}?action=getProperty&key={k}", timeout=30.0)
+        client_httpx.get(f"{script_url}?action=getProperty&key={k}", timeout=60.0)
         for k in keys
     ]
     responses = await asyncio.gather(*tasks)
@@ -158,7 +158,7 @@ async def _set_apps_script_property(
     """Set a configuration property in Google Apps Script asynchronously."""
     params = {"action": "setProperty", "key": key, "value": value}
     print(f"   -> Setting Script Property '{key}'...")
-    r = await client_httpx.get(script_url, params=params, timeout=30.0)
+    r = await client_httpx.get(script_url, params=params, timeout=60.0)
     if r.status_code != 200:
         raise Exception(
             f"Failed to set property '{key}'. Status: {r.status_code}, Body: {r.text}"
@@ -238,26 +238,42 @@ async def run_ai_content_population(
 
         # Initialize clients
         client_genai = genai.Client(api_key=config.gemini_api_key)
-        async with httpx.AsyncClient() as client_httpx:
+        async with httpx.AsyncClient(follow_redirects=True) as client_httpx:
 
             # Step 1: Run destructor to reset Apps Script properties
             if on_status:
                 on_status("Running destructor...")
-            print("\n[1/6] Running destructor...")
+            print("\n[1/7] Running destructor...")
             r = await client_httpx.get(
                 f"{config.gas_web_app_url}?action=run&mode=destructor",
-                timeout=60.0
+                timeout=120.0
             )
             if r.status_code != 200:
                 raise Exception(f"Destructor failed. Status: {r.status_code}")
 
+            # Step 1b: Set ORIGINAL_SLIDES_ID, FOLDER_DRIVE_ID, and SERVICE_ACCOUNT_EMAIL in Apps Script
+            print("[1b/7] Configuring Apps Script properties...")
+            await _set_apps_script_property(
+                client_httpx, config.gas_web_app_url,
+                "ORIGINAL_SLIDES_ID", config.original_slides_id
+            )
+            await _set_apps_script_property(
+                client_httpx, config.gas_web_app_url,
+                "FOLDER_DRIVE_ID", config.folder_drive_id
+            )
+            if config.google_service_account_email:
+                await _set_apps_script_property(
+                    client_httpx, config.gas_web_app_url,
+                    "SERVICE_ACCOUNT_EMAIL", config.google_service_account_email
+                )
+
             # Step 2: Run template generation
             if on_status:
                 on_status("Generating template...")
-            print("[2/6] Generating template...")
+            print("[2/7] Generating template...")
             r = await client_httpx.get(
                 f"{config.gas_web_app_url}?action=run&mode=template",
-                timeout=60.0
+                timeout=120.0
             )
             if r.status_code != 200:
                 raise Exception(f"Template generation failed. Status: {r.status_code}")
@@ -265,17 +281,27 @@ async def run_ai_content_population(
             cloned_slides_url = template_response.get("url")
             print(f"   -> Cloned slides: {cloned_slides_url}")
 
-            # Step 3: Fetch Apps Script config properties
+            # Step 3: Fetch Apps Script config properties (with retries — properties may not be ready immediately)
             if on_status:
                 on_status("Fetching configuration...")
-            print("[3/6] Fetching configuration...")
-            configs = await _fetch_apps_script_configs(client_httpx, config.gas_web_app_url)
-            stylemap_file_id = configs.get("STYLEMAP_FILE_ID")
-            content_sheet_id = configs.get("CONTENT_SHEET_ID")
-            stylemap_file_address = configs.get("STYLEMAP_FILE_ADDRESS")
+            print("[3/7] Fetching configuration...")
+            stylemap_file_id = None
+            content_sheet_id = None
+            stylemap_file_address = None
+            for attempt in range(6):
+                configs = await _fetch_apps_script_configs(client_httpx, config.gas_web_app_url)
+                stylemap_file_id = configs.get("STYLEMAP_FILE_ID")
+                content_sheet_id = configs.get("CONTENT_SHEET_ID")
+                stylemap_file_address = configs.get("STYLEMAP_FILE_ADDRESS")
+                if all([stylemap_file_id, content_sheet_id, stylemap_file_address]):
+                    break
+                print(f"   -> Attempt {attempt + 1}/6: properties not ready, retrying in 4s...")
+                await asyncio.sleep(4)
 
-            if not all([stylemap_file_id, content_sheet_id, stylemap_file_address]):
-                raise Exception(f"Missing config from Apps Script: {configs}")
+            if not content_sheet_id:
+                raise Exception("Timed out waiting for CONTENT_SHEET_ID from Apps Script.")
+            if not stylemap_file_id:
+                raise Exception("Timed out waiting for STYLEMAP_FILE_ID from Apps Script.")
             print(f"   -> StyleMap File ID: {stylemap_file_id}")
             print(f"   -> Content Sheet ID: {content_sheet_id}")
 
@@ -286,15 +312,21 @@ async def run_ai_content_population(
             uploaded_files = _upload_and_wait_for_files(client_genai, [temp_pdf])
             context_files = [
                 types.Part.from_uri(
-                    uri=f.uri,
+                    file_uri=f.uri,
                     mime_type="application/pdf"
                 ) for f in uploaded_files
             ]
             print("   -> Files uploaded and ACTIVE.")
 
-            # Load style map from Drive
-            print("   -> Loading style map...")
-            stylemap_data = _read_json_from_drive(stylemap_file_id, config.gdrive_credentials_path)
+            # Load style map via GAS proxy (avoids service account Drive permission requirement)
+            print("   -> Loading style map via GAS proxy...")
+            r = await client_httpx.get(
+                f"{config.gas_web_app_url}?action=getStyleMap",
+                timeout=60.0
+            )
+            if r.status_code != 200:
+                raise Exception(f"Failed to fetch style map. Status: {r.status_code}, Body: {r.text}")
+            stylemap_data = r.json()
             stylemap_df = pd.DataFrame(stylemap_data)
 
             # Step 5: Generate slide content asynchronously
@@ -334,10 +366,10 @@ async def run_ai_content_population(
 
             print(f"   -> Generated content for {len(all_ai_results)} slides")
 
-            # Step 6: Merge results and write to sheet
+            # Step 6: Merge results and write to sheet via GAS proxy
             if on_status:
                 on_status("Writing to sheet...")
-            print("[6/6] Writing results to Google Sheet...")
+            print("[6/6] Writing results to Google Sheet via GAS proxy...")
 
             # Flatten all AI results for merging
             all_ai_data = []
@@ -350,13 +382,39 @@ async def run_ai_content_population(
             # Merge with original style map
             merged_df = _merge_ai_output_with_template(stylemap_df, all_ai_data)
 
-            # Write to the content sheet
-            _write_dataframe_to_sheet(
-                sheet_id=content_sheet_id,
-                range_name=stylemap_file_address,
-                df=merged_df,
-                credentials_path=config.gdrive_credentials_path
+            # Prepare the DataFrame exactly as GAS expects:
+            # required columns: placeholderId, slideNumber, type, originalContent, contentRuns, newContent
+            def _safe_json(v):
+                return json.dumps(v) if isinstance(v, (list, dict)) else (v if isinstance(v, str) else "[]")
+
+            def _safe_text(v):
+                if isinstance(v, list):
+                    return "".join(r.get("text", "") for r in v if isinstance(r, dict))
+                return ""
+
+            df_out = merged_df.copy()
+            for col in ["placeholderId", "slideNumber", "type", "originalContent"]:
+                if col not in df_out.columns:
+                    df_out[col] = ""
+            if "contentRuns" not in df_out.columns:
+                df_out["contentRuns"] = [[] for _ in range(len(df_out))]
+
+            df_out["newContent"] = df_out["contentRuns"].apply(_safe_text)
+            df_out["contentRuns"] = df_out["contentRuns"].apply(_safe_json)
+            df_out = df_out[
+                ["placeholderId", "slideNumber", "type", "originalContent", "contentRuns", "newContent"]
+            ].fillna("")
+
+            rows = [df_out.columns.tolist()] + df_out.values.tolist()
+
+            r = await client_httpx.post(
+                config.gas_web_app_url,
+                json={"action": "setContent", "rows": rows},
+                timeout=120.0,
             )
+            if r.status_code != 200:
+                raise Exception(f"Sheet write failed. Status: {r.status_code}, Body: {r.text}")
+            print(f"   -> Sheet write response: {r.json()}")
 
             # Step 7: Run final generation to populate slides
             if on_status:
@@ -364,12 +422,19 @@ async def run_ai_content_population(
             print("\n[7/7] Running final population...")
             r = await client_httpx.get(
                 f"{config.gas_web_app_url}?action=run&mode=slides",
-                timeout=120.0
+                timeout=300.0
             )
             if r.status_code != 200:
                 raise Exception(f"Final population failed. Status: {r.status_code}")
             final_response = r.json()
+
+            # GAS always returns HTTP 200 — check the body for errors
+            if "error" in final_response:
+                raise Exception(f"GAS slides error: {final_response.get('error')} — {final_response.get('details', '')}")
+
             final_url = final_response.get("url")
+            if not final_url:
+                raise Exception(f"GAS returned no URL. Full response: {final_response}")
 
             if on_status:
                 on_status("Complete!")

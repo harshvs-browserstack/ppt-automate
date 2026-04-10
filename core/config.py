@@ -22,6 +22,7 @@ class Config:
     folder_drive_id: str
     slides_batch_size: int
     research_files_folder_id: str
+    google_service_account_email: str = ""
 
 
 def get_config() -> Config:
@@ -62,4 +63,5 @@ def get_config() -> Config:
         folder_drive_id=require("FOLDER_DRIVE_ID"),
         slides_batch_size=int(os.getenv("SLIDES_BATCH_SIZE", "5")),
         research_files_folder_id=require("RESEARCH_FILES_FOLDER_ID"),
+        google_service_account_email=os.getenv("GOOGLE_SERVICE_ACCOUNT_EMAIL", ""),
     )
