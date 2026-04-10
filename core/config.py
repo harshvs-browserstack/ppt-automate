@@ -21,6 +21,7 @@ class Config:
     original_slides_id: str
     folder_drive_id: str
     slides_batch_size: int
+    research_files_folder_id: str
 
 
 def get_config() -> Config:
@@ -33,6 +34,7 @@ def get_config() -> Config:
     - GDRIVE_CREDENTIALS_PATH
     - ORIGINAL_SLIDES_ID
     - FOLDER_DRIVE_ID
+    - RESEARCH_FILES_FOLDER_ID
 
     Optional variables (with defaults):
     - GEMINI_MODEL_ID (default: "gemini-2.5-flash")
@@ -59,4 +61,5 @@ def get_config() -> Config:
         original_slides_id=require("ORIGINAL_SLIDES_ID"),
         folder_drive_id=require("FOLDER_DRIVE_ID"),
         slides_batch_size=int(os.getenv("SLIDES_BATCH_SIZE", "5")),
+        research_files_folder_id=require("RESEARCH_FILES_FOLDER_ID"),
     )
