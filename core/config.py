@@ -1,14 +1,47 @@
 """
 Configuration module for Document-to-Deck application.
 Loads environment variables and provides validated configuration.
+Supports both local .env files and Streamlit Cloud secrets.
 """
 import os
+import json
+import tempfile
 from dataclasses import dataclass
 from dotenv import load_dotenv
 
 
-# Load .env file on module import
+# Load .env file on module import (for local development)
 load_dotenv()
+
+
+def _create_credentials_file_from_json_string(json_string: str) -> str:
+    """
+    Create a temporary credentials file from a JSON string.
+    Used for Streamlit Cloud deployments where credentials come as a secret string.
+
+    Args:
+        json_string: JSON credentials as a string
+
+    Returns:
+        Path to the temporary credentials file
+    """
+    try:
+        # Parse to validate it's valid JSON
+        credentials_dict = json.loads(json_string)
+
+        # Create a temporary file that persists for the session
+        temp_file = tempfile.NamedTemporaryFile(
+            mode='w',
+            suffix='.json',
+            delete=False,
+            prefix='credentials_'
+        )
+        json.dump(credentials_dict, temp_file)
+        temp_file.close()
+
+        return temp_file.name
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in GDRIVE_CREDENTIALS_JSON: {e}")
 
 
 @dataclass
@@ -34,10 +67,12 @@ def get_config() -> Config:
     """
     Load and validate configuration from environment variables.
 
+    Supports both local .env files and Streamlit Cloud secrets.
+
     Required variables:
     - GEMINI_API_KEY
     - GAS_WEB_APP_URL
-    - GDRIVE_CREDENTIALS_PATH
+    - Either GDRIVE_CREDENTIALS_PATH (local) or GDRIVE_CREDENTIALS_JSON (Streamlit Cloud)
     - FOLDER_DRIVE_ID
     - RESEARCH_FILES_FOLDER_ID
 
@@ -60,11 +95,23 @@ def get_config() -> Config:
             raise EnvironmentError(f"Required environment variable '{key}' is not set.")
         return val
 
+    # Handle credentials: try GDRIVE_CREDENTIALS_PATH first (local), then GDRIVE_CREDENTIALS_JSON (Streamlit Cloud)
+    credentials_path = os.getenv("GDRIVE_CREDENTIALS_PATH")
+    if not credentials_path:
+        credentials_json = os.getenv("GDRIVE_CREDENTIALS_JSON")
+        if credentials_json:
+            # We're running on Streamlit Cloud or similar, create temp file from JSON
+            credentials_path = _create_credentials_file_from_json_string(credentials_json)
+        else:
+            raise EnvironmentError(
+                "Either GDRIVE_CREDENTIALS_PATH or GDRIVE_CREDENTIALS_JSON must be set."
+            )
+
     return Config(
         gemini_api_key=require("GEMINI_API_KEY"),
         model_id=os.getenv("GEMINI_MODEL_ID", "gemini-2.5-flash"),
         gas_web_app_url=require("GAS_WEB_APP_URL"),
-        gdrive_credentials_path=require("GDRIVE_CREDENTIALS_PATH"),
+        gdrive_credentials_path=credentials_path,
         folder_drive_id=require("FOLDER_DRIVE_ID"),
         slides_batch_size=int(os.getenv("SLIDES_BATCH_SIZE", "5")),
         research_files_folder_id=require("RESEARCH_FILES_FOLDER_ID"),
