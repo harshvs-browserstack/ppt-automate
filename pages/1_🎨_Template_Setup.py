@@ -51,17 +51,15 @@ templates = load_templates(REGISTRY_PATH)
 if templates:
     st.markdown('<div class="section-label">Existing Templates</div>', unsafe_allow_html=True)
     for t in templates:
-        col1, col_edit, col_delete = st.columns([4, 0.8, 0.8])
-        col1.markdown(
-            f'<div style="padding:0.75rem;border:1px solid;border-color:#E5E7EB;'
-            f'@media(prefers-color-scheme:dark){{border-color:#334155;}}">'
-            f'<div style="font-weight:600;margin-bottom:0.25rem">{t.name}</div>'
-            f'<div style="font-size:0.875rem;color:#6B7280;'
-            f'@media(prefers-color-scheme:dark){{color:#94A3B8;}}">{t.variable_label}</div>'
+        col_info, col_edit, col_delete = st.columns([3.2, 0.4, 0.4])
+        col_info.markdown(
+            f'<div style="padding:0.75rem;border:1px solid #334155;background:#1E293B;border-radius:0">'
+            f'<div style="font-weight:600;margin-bottom:0.25rem;color:#F1F5F9">{t.name}</div>'
+            f'<div style="font-size:0.875rem;color:#94A3B8">{t.variable_label}</div>'
             f'</div>',
             unsafe_allow_html=True,
         )
-        if col_edit.button("Edit", key=f"edit_{t.id}"):
+        if col_edit.button("Edit", key=f"edit_{t.id}", use_container_width=True):
             st.session_state.setup_editing_id = t.id
             # Pre-populate slides from saved defaults
             st.session_state.setup_slides_loaded = [
@@ -71,14 +69,12 @@ if templates:
                 s.number: s.enabled for s in t.slides
             }
             st.rerun()
-        if col_delete.button("Delete", key=f"delete_{t.id}"):
+        if col_delete.button("Delete", key=f"delete_{t.id}", use_container_width=True):
             # Remove template and save
             updated = [x for x in templates if x.id != t.id]
             save_templates(updated, REGISTRY_PATH)
             st.rerun()
     st.divider()
-else:
-    st.markdown("<br>", unsafe_allow_html=True)
 
 # ── Form: create or edit ───────────────────────────────────────────────────
 editing = get_template_by_id(templates, st.session_state.setup_editing_id) if st.session_state.setup_editing_id else None
@@ -89,17 +85,23 @@ template_name = st.text_input(
     label="Template Name",
     value=editing.name if editing else "",
     placeholder="e.g. Industry Targeted Comparison",
+    key="template_name_input",
 )
 
-st.markdown('<div style="height:0.5rem"></div>', unsafe_allow_html=True)
+st.markdown('<div style="height:0.75rem"></div>', unsafe_allow_html=True)
 
-col_slides, col_btn = st.columns([4, 1])
-slides_url = col_slides.text_input(
-    label="Google Slides Template",
-    value=editing.slides_id if editing else "",
-    placeholder="Paste Google Slides URL or ID",
-)
-load_clicked = col_btn.button("Load Slides →", use_container_width=True)
+col_slides, col_btn = st.columns([5.5, 1.2])
+with col_slides:
+    slides_url = st.text_input(
+        label="Google Slides Template",
+        value=editing.slides_id if editing else "",
+        placeholder="Paste Google Slides URL or ID",
+        key="slides_url_input",
+    )
+with col_btn:
+    st.markdown('<div style="height:1.75rem"></div>', unsafe_allow_html=True)
+    load_clicked = st.button("Load Slides →", use_container_width=True, key="load_slides_btn")
+
 st.caption("Fetches slide structure from your template deck.")
 
 if load_clicked and slides_url.strip():
@@ -116,20 +118,24 @@ if load_clicked and slides_url.strip():
 st.markdown('<div style="height:1rem"></div>', unsafe_allow_html=True)
 
 col_lbl, col_hint_input = st.columns(2)
-variable_label = col_lbl.text_input(
-    label="Label shown to users",
-    value=editing.variable_label if editing else "",
-    placeholder="e.g. Competitor Name",
-)
-variable_hint = col_hint_input.text_input(
-    label="Placeholder hint",
-    value=editing.variable_hint if editing else "",
-    placeholder="e.g. Sauce Labs",
-)
+with col_lbl:
+    variable_label = st.text_input(
+        label="Label shown to users",
+        value=editing.variable_label if editing else "",
+        placeholder="e.g. Competitor Name",
+        key="var_label_input",
+    )
+with col_hint_input:
+    variable_hint = st.text_input(
+        label="Placeholder hint",
+        value=editing.variable_hint if editing else "",
+        placeholder="e.g. Sauce Labs",
+        key="var_hint_input",
+    )
 
 # ── Slide defaults ─────────────────────────────────────────────────────────
 if st.session_state.setup_slides_loaded:
-    st.markdown("**Slides — Set Defaults**")
+    st.markdown('<div class="section-label">Slides — Set Defaults</div>', unsafe_allow_html=True)
     st.caption("Toggle off slides that should be excluded by default. Keep enabled the slides that appear in every generation.")
     for slide in st.session_state.setup_slides_loaded:
         num = slide["number"]
@@ -141,58 +147,62 @@ if st.session_state.setup_slides_loaded:
         )
         st.session_state.setup_slide_defaults[num] = enabled
 
+st.markdown('<div style="height:1.5rem"></div>', unsafe_allow_html=True)
+
 # ── Save ───────────────────────────────────────────────────────────────────
-if st.button("Save Template", type="primary"):
-    if not template_name.strip():
-        st.error("Template name is required.")
-    elif not slides_url.strip():
-        st.error("Google Slides URL or ID is required.")
-    elif not variable_label.strip():
-        st.error("Variable label is required.")
-    elif not st.session_state.setup_slides_loaded:
-        st.error("Please load slides before saving.")
-    else:
-        slides_id = _extract_slides_id(slides_url.strip())
-        slide_defaults = [
-            SlideDefault(
-                number=s["number"],
-                title=s["title"],
-                enabled=st.session_state.setup_slide_defaults.get(s["number"], True),
+col_save = st.columns([1, 4])[1]  # Right-align the button
+with col_save:
+    if st.button("Save Template", type="primary", use_container_width=False):
+        if not template_name.strip():
+            st.error("Template name is required.")
+        elif not slides_url.strip():
+            st.error("Google Slides URL or ID is required.")
+        elif not variable_label.strip():
+            st.error("Variable label is required.")
+        elif not st.session_state.setup_slides_loaded:
+            st.error("Please load slides before saving.")
+        else:
+            slides_id = _extract_slides_id(slides_url.strip())
+            slide_defaults = [
+                SlideDefault(
+                    number=s["number"],
+                    title=s["title"],
+                    enabled=st.session_state.setup_slide_defaults.get(s["number"], True),
+                )
+                for s in st.session_state.setup_slides_loaded
+            ]
+            new_t = Template(
+                id=editing.id if editing else new_template_id(),
+                name=template_name.strip(),
+                slides_id=slides_id,
+                variable_label=variable_label.strip(),
+                variable_hint=variable_hint.strip(),
+                slides=slide_defaults,
             )
-            for s in st.session_state.setup_slides_loaded
-        ]
-        new_t = Template(
-            id=editing.id if editing else new_template_id(),
-            name=template_name.strip(),
-            slides_id=slides_id,
-            variable_label=variable_label.strip(),
-            variable_hint=variable_hint.strip(),
-            slides=slide_defaults,
-        )
-        # Replace or append
-        updated = [new_t if t.id == new_t.id else t for t in templates]
-        if new_t.id not in {t.id for t in templates}:
-            updated.append(new_t)
-        save_templates(updated, REGISTRY_PATH)
+            # Replace or append
+            updated = [new_t if t.id == new_t.id else t for t in templates]
+            if new_t.id not in {t.id for t in templates}:
+                updated.append(new_t)
+            save_templates(updated, REGISTRY_PATH)
 
-        # Show success banner at top
-        success_banner.markdown(
-            f'<div style="background:rgba(16,185,129,0.1);border:1.5px solid #10B981;padding:1rem;'
-            f'border-radius:0;margin-bottom:1rem">'
-            f'<div style="display:flex;align-items:center;gap:8px">'
-            f'<span style="font-size:20px;color:#10B981">✓</span>'
-            f'<span style="color:#10B981;font-weight:600">Template Saved!</span>'
-            f'</div></div>',
-            unsafe_allow_html=True,
-        )
+            # Show success banner at top
+            success_banner.markdown(
+                f'<div style="background:rgba(16,185,129,0.1);border:1.5px solid #10B981;padding:1rem;'
+                f'border-radius:0;margin-bottom:1rem">'
+                f'<div style="display:flex;align-items:center;gap:8px">'
+                f'<span style="font-size:20px;color:#10B981">✓</span>'
+                f'<span style="color:#10B981;font-weight:600">Template Saved!</span>'
+                f'</div></div>',
+                unsafe_allow_html=True,
+            )
 
-        # Reset form state
-        st.session_state.setup_editing_id = None
-        st.session_state.setup_slides_loaded = []
-        st.session_state.setup_slide_defaults = {}
+            # Reset form state
+            st.session_state.setup_editing_id = None
+            st.session_state.setup_slides_loaded = []
+            st.session_state.setup_slide_defaults = {}
 
-        # Clear banner after 2 seconds
-        import time
-        time.sleep(2)
-        success_banner.empty()
-        st.rerun()
+            # Clear banner after 2 seconds
+            import time
+            time.sleep(2)
+            success_banner.empty()
+            st.rerun()
