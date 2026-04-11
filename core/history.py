@@ -3,7 +3,7 @@ Generation history tracking.
 Logs all slide generations to a Google Sheet for audit trail.
 """
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Callable
 from core.auth_helpers import get_sheets_service
 import logging
 
@@ -17,6 +17,7 @@ def log_generation(
     template_name: Optional[str] = None,
     target_value: Optional[str] = None,
     pdf_filename: Optional[str] = None,
+    on_logged: Optional[Callable] = None,
 ) -> None:
     """
     Log a slide generation to the history sheet.
@@ -28,6 +29,7 @@ def log_generation(
         template_name: Name of the template used (optional)
         target_value: The target variable value (optional)
         pdf_filename: Name of the uploaded PDF (optional)
+        on_logged: Optional callback function called after successful log (takes no args)
     """
     if not history_sheet_id or history_sheet_id == "-":
         logger.debug("History sheet not configured, skipping generation log.")
@@ -105,6 +107,9 @@ def log_generation(
         ).execute()
 
         logger.info(f"Generation logged: {slide_id}")
+
+        if on_logged:
+            on_logged()
 
     except Exception as e:
         logger.warning(f"Could not log generation to history: {e}")
