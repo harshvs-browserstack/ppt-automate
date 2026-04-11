@@ -69,7 +69,7 @@ if templates:
                 s.number: s.enabled for s in t.slides
             }
             st.rerun()
-        if col_delete.button("Delete", key=f"delete_{t.id}", use_container_width=True):
+        if col_delete.button("🗑️", key=f"delete_{t.id}", use_container_width=True):
             # Remove template and save
             updated = [x for x in templates if x.id != t.id]
             save_templates(updated, REGISTRY_PATH)

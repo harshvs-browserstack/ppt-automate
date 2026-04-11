@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editorial Template Setup - Dark Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,700&family=Switzer:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0F172A;
+            color: #F1F5F9;
+            font-family: 'Switzer', sans-serif;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Newsreader', serif;
+            font-size: 2.25rem;
+            color: #A78BFA;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #94A3B8;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94A3B8;
+            margin-bottom: 1rem;
+        }
+
+        .template-item {
+            background-color: #1E293B;
+            border: 1px solid #334155;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .template-info {
+            flex: 1;
+        }
+
+        .template-name {
+            font-weight: 600;
+            color: #F1F5F9;
+            margin-bottom: 0.25rem;
+        }
+
+        .template-desc {
+            font-size: 0.875rem;
+            color: #94A3B8;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #334155;
+            background-color: transparent;
+            color: #F1F5F9;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-family: 'Switzer', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            border-color: #A78BFA;
+            color: #A78BFA;
+        }
+
+        button.primary {
+            background-color: #1E1B4B;
+            color: #F1F5F9;
+            border: 1px solid #1E1B4B;
+        }
+
+        button.primary:hover {
+            background-color: #3730A3;
+            border-color: #3730A3;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: #F1F5F9;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #1E293B;
+            border: 1px solid #334155;
+            border-radius: 0;
+            color: #F1F5F9;
+            font-family: 'Switzer', sans-serif;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #A78BFA;
+        }
+
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            color: #64748B;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: #94A3B8;
+            margin-top: 0.25rem;
+        }
+
+        .slide-toggle {
+            background-color: #1E293B;
+            border: 1px solid #334155;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+
+        .toggle-switch {
+            width: 40px;
+            height: 24px;
+            background-color: #334155;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle-switch.active {
+            background-color: #10B981;
+        }
+
+        .toggle-circle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s ease;
+        }
+
+        .toggle-switch.active .toggle-circle {
+            left: 18px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #334155;
+            margin: 2rem 0;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        button.save {
+            background-color: #F1F5F9;
+            color: #0F172A;
+            border: 1px solid #F1F5F9;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+
+        button.save:hover {
+            background-color: #E2E8F0;
+            border-color: #E2E8F0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Editorial Template Setup</h1>
+        <p class="subtitle">Create and manage presentation templates.</p>
+
+        <div class="section">
+            <h2 class="section-title">Existing Templates</h2>
+
+            <div class="template-item">
+                <div class="template-info">
+                    <div class="template-name">Industry Pitchdeck</div>
+                    <div class="template-desc">Client Industry</div>
+                </div>
+                <div class="button-group">
+                    <button>Edit</button>
+                    <button>🗑️</button>
+                </div>
+            </div>
+
+            <div class="template-item">
+                <div class="template-info">
+                    <div class="template-name">Competitor Comparison - Platform</div>
+                    <div class="template-desc">Competitor Name</div>
+                </div>
+                <div class="button-group">
+                    <button>Edit</button>
+                    <button>🗑️</button>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h2 class="section-title">New Template</h2>
+
+            <div class="form-group">
+                <label class="form-label">Template Name</label>
+                <input type="text" placeholder="e.g. Industry Targeted Comparison">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Google Slides Template</label>
+                <div class="input-group">
+                    <input type="text" placeholder="Paste Google Slides URL or ID">
+                    <button class="primary">Load Slides →</button>
+                </div>
+                <div class="hint">Fetches slide structure from your template deck.</div>
+            </div>
+
+            <div class="input-group">
+                <div class="form-group">
+                    <label class="form-label">Label shown to users</label>
+                    <input type="text" placeholder="e.g. Competitor Name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Placeholder hint</label>
+                    <input type="text" placeholder="e.g. Sauce Labs">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Slides — Set Defaults</label>
+                <p style="font-size: 0.875rem; color: #94A3B8; margin-bottom: 1rem;">
+                    Toggle off slides that should be excluded by default. Keep enabled the slides that appear in every generation.
+                </p>
+
+                <div class="slide-toggle">
+                    <span>Slide 1: Cover</span>
+                    <div class="toggle-switch active">
+                        <div class="toggle-circle"></div>
+                    </div>
+                </div>
+                <div class="slide-toggle">
+                    <span>Slide 2: Agenda</span>
+                    <div class="toggle-switch active">
+                        <div class="toggle-circle"></div>
+                    </div>
+                </div>
+                <div class="slide-toggle">
+                    <span>Slide 3: Overview</span>
+                    <div class="toggle-switch">
+                        <div class="toggle-circle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <button class="save">Save Template</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
