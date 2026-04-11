@@ -52,6 +52,20 @@ function populateTemplateFromSheet() {
   newPresentation.saveAndClose();
   Logger.log('Population complete.');
 
+  // Share with shared drive
+  const sharedDriveId = PropertiesService.getScriptProperties().getProperty('GOOGLE_SHARED_DRIVE_ID');
+  if (sharedDriveId && sharedDriveId !== '-') {
+    try {
+      shareSlideWithSharedDrive_(newPresentationFile.getId(), sharedDriveId);
+      Logger.log('Slide shared with shared drive.');
+    } catch (e) {
+      Logger.log(`Warning: Could not share slide with shared drive: ${e.message}`);
+    }
+  }
+
+  // Log generation to history sheet
+  logGeneration_(presentationUrl, null, null, null);
+
   return presentationUrl;
 }
 
@@ -181,4 +195,18 @@ function getJsonFromDrive_(fileId) {
   const file = DriveApp.getFileById(fileId);
   const jsonString = file.getBlob().getDataAsString();
   return JSON.parse(jsonString);
+}
+
+function shareSlideWithSharedDrive_(slideFileId, sharedDriveId) {
+  try {
+    const slideFile = DriveApp.getFileById(slideFileId);
+    const sharedDrive = DriveApp.getFolderById(sharedDriveId);
+
+    // Add the file to the shared drive
+    sharedDrive.addFile(slideFile);
+    Logger.log(`File ${slideFileId} moved to shared drive ${sharedDriveId}`);
+  } catch (e) {
+    Logger.log(`Error sharing slide: ${e.message}`);
+    throw e;
+  }
 }
