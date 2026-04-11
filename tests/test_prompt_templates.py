@@ -34,3 +34,27 @@ def test_prompt_contains_json_output_instruction():
         template_view_pdf_name="t.pdf",
     )
     assert "json" in prompt.lower()
+
+
+def test_custom_template_context_replaces_battlecard_context():
+    """When template_context is provided, it replaces the hardcoded battlecard context."""
+    elements = [{"placeholderId": "t1", "originalContent": "Title", "contentRuns": []}]
+    prompt = create_slide_generation_prompt(
+        slide_elements_json=elements,
+        competitor="Fintech",
+        template_view_pdf_name="ref.pdf",
+        template_context="This is an industry pitch deck for the Fintech sector.",
+    )
+    assert "Fintech" in prompt
+    assert "This is an industry pitch deck" in prompt
+
+
+def test_default_context_is_battlecard():
+    """Without template_context, prompt defaults to battlecard language."""
+    elements = []
+    prompt = create_slide_generation_prompt(
+        slide_elements_json=elements,
+        competitor="Acme",
+        template_view_pdf_name="ref.pdf",
+    )
+    assert "battlecard" in prompt.lower()

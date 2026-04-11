@@ -10,6 +10,7 @@ def create_slide_generation_prompt(
     slide_elements_json: List[Dict[str, Any]],
     competitor: str,
     template_view_pdf_name: str,
+    template_context: str = "",
 ) -> str:
     """
     Build the Gemini prompt for a single slide's content generation.
@@ -24,17 +25,22 @@ def create_slide_generation_prompt(
         slide_elements_json: List of text element dicts with placeholderId, originalContent, contentRuns
         competitor: Name of competitor or target client
         template_view_pdf_name: Name of the template PDF for reference
+        template_context: Optional override for the context section.
+            If empty, defaults to battlecard framing.
 
     Returns:
         A complete prompt string for Gemini
     """
+    # Default context if not provided
+    context = template_context if template_context else f"The presentation is a competitive battlecard comparing BrowserStack to {competitor}."
+
     return f"""
 You are a helpful assistant tasked with generating a competitive battlecard in JSON format, comparing BrowserStack and {competitor}.
 Use the provided JSON template structure as a guide for the output format.
 Replace the existing content in the template with new content comparing "BrowserStack vs {competitor}", drawing from the provided source documents.
 
 **CONTEXT:**
-The presentation is a competitive battlecard comparing BrowserStack to {competitor}.
+{context}
 Use the attached research documents to inform the content you generate.
 Use the document named {template_view_pdf_name} for context on what the presentation should look like.
 
