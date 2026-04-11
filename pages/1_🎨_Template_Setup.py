@@ -66,7 +66,7 @@ if templates:
             f'</div>',
             unsafe_allow_html=True,
         )
-        if col_edit.button("Edit", key=f"edit_{t.id}", use_container_width=True):
+        if col_edit.button("✏️", key=f"edit_{t.id}", use_container_width=True):
             st.session_state.setup_editing_id = t.id
             # Pre-populate slides from saved defaults
             st.session_state.setup_slides_loaded = [
