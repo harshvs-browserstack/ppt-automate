@@ -1,0 +1,133 @@
+<h2>Suggest Template Flow — Three States</h2>
+<p class="subtitle">Triggered by clicking "Quick Generate" banner or "✦ Suggest" button. Inline expansion, no modal.</p>
+
+<div style="display:flex;gap:12px;overflow-x:auto">
+
+  <!-- STATE 1: Input — user describes goal -->
+  <div class="mockup" style="min-width:300px;flex:1">
+    <div class="mockup-header">State 1 — Describe your goal</div>
+    <div class="mockup-body" style="background:#F9FAFB;padding:16px;font-family:sans-serif">
+
+      <!-- Banners collapsed since Quick Generate was clicked -->
+      <div style="background:#1E1B4B;color:#fff;padding:8px 12px;border-radius:6px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <span style="font-size:10px;opacity:0.7;text-transform:uppercase;letter-spacing:0.08em">⚡ Quick Generate</span>
+          <span style="font-size:12px;font-weight:600;margin-left:8px">active</span>
+        </div>
+        <span style="font-size:11px;opacity:0.6;cursor:pointer">✕ cancel</span>
+      </div>
+
+      <!-- Inline natural language input -->
+      <div style="background:#fff;border:1.5px solid #1E1B4B;border-radius:6px;padding:14px;margin-bottom:10px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">What do you need?</div>
+        <textarea style="width:100%;box-sizing:border-box;border:1px solid #E5E7EB;border-radius:4px;padding:8px;font-size:12px;color:#374151;resize:none;height:64px;font-family:sans-serif" placeholder="e.g. I need a deck comparing BrowserStack to Sauce Labs for an enterprise fintech prospect..."></textarea>
+        <div style="margin-top:8px;display:flex;justify-content:flex-end">
+          <div style="background:#1E1B4B;color:#fff;padding:6px 16px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer">Suggest →</div>
+        </div>
+      </div>
+
+      <!-- Template row greyed out while suggesting -->
+      <div style="opacity:0.35;background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:12px">
+        <div style="font-size:10px;color:#9CA3AF;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Template</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Competitor Battlecard</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Industry Pitch Deck</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STATE 2: AI suggests a template -->
+  <div class="mockup" style="min-width:300px;flex:1">
+    <div class="mockup-header">State 2 — AI Suggestion</div>
+    <div class="mockup-body" style="background:#F9FAFB;padding:16px;font-family:sans-serif">
+
+      <div style="background:#1E1B4B;color:#fff;padding:8px 12px;border-radius:6px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <span style="font-size:10px;opacity:0.7;text-transform:uppercase;letter-spacing:0.08em">⚡ Quick Generate</span>
+          <span style="font-size:12px;font-weight:600;margin-left:8px">active</span>
+        </div>
+        <span style="font-size:11px;opacity:0.6;cursor:pointer">✕ cancel</span>
+      </div>
+
+      <!-- Suggestion card -->
+      <div style="background:#fff;border:1.5px solid #059669;border-radius:6px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          <div style="background:#059669;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">✦ Suggested</div>
+          <div style="font-size:13px;font-weight:700;color:#1E1B4B">Competitor Battlecard</div>
+        </div>
+        <div style="font-size:11px;color:#6B7280;margin-bottom:12px;line-height:1.5">
+          Your description mentions a head-to-head comparison with Sauce Labs for an enterprise prospect — the Competitor Battlecard template is built exactly for this.
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;background:#1E1B4B;color:#fff;padding:8px;border-radius:4px;text-align:center;font-size:12px;font-weight:600;cursor:pointer">Use this template →</div>
+          <div style="background:#fff;border:1px solid #D1D5DB;color:#6B7280;padding:8px 12px;border-radius:4px;text-align:center;font-size:12px;cursor:pointer">Pick another</div>
+        </div>
+      </div>
+
+      <!-- Template row still accessible -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:12px">
+        <div style="font-size:10px;color:#9CA3AF;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Or pick manually</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px;cursor:pointer">Competitor Battlecard</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px;cursor:pointer">Industry Pitch Deck</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STATE 3: Accepted — form fills in, suggestion panel collapses -->
+  <div class="mockup" style="min-width:300px;flex:1">
+    <div class="mockup-header">State 3 — Template Accepted</div>
+    <div class="mockup-body" style="background:#F9FAFB;padding:16px;font-family:sans-serif">
+
+      <!-- Banners fully collapsed to slim bar -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;align-items:center">
+        <div style="background:#1E1B4B;color:#fff;padding:3px 10px;border-radius:4px;font-size:10px">⚡ Quick Generate</div>
+        <div style="font-size:11px;color:#9CA3AF">Template: <strong style="color:#1E1B4B">Competitor Battlecard</strong></div>
+        <div style="margin-left:auto;font-size:10px;color:#6B7280;text-decoration:underline;cursor:pointer">Change</div>
+      </div>
+
+      <!-- Template row — selected state -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:12px;margin-bottom:10px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Template</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="background:#1E1B4B;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600">✓ Competitor Battlecard</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Industry Pitch Deck</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Executive Summary</div>
+        </div>
+      </div>
+
+      <!-- Variable — pre-filled from description if extractable -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:12px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Competitor Name</div>
+          <div style="font-size:10px;color:#059669;background:#ECFDF5;padding:1px 6px;border-radius:10px">auto-filled</div>
+        </div>
+        <input class="mock-input" value="Sauce Labs" style="width:100%;box-sizing:border-box;border-color:#059669;color:#1E1B4B"/>
+      </div>
+
+      <!-- PDF upload -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:12px;margin-bottom:16px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Research PDF</div>
+        <div style="border:1.5px dashed #D1D5DB;border-radius:4px;padding:16px;text-align:center;font-size:12px;color:#9CA3AF;cursor:pointer">
+          Drop PDF here or click to browse
+        </div>
+      </div>
+
+      <div style="background:#1E1B4B;color:#fff;padding:10px;border-radius:6px;text-align:center;font-size:13px;font-weight:600;cursor:pointer">
+        Generate Deck →
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">
+  <strong>State 1:</strong> Quick Generate expands inline — natural language textarea, template row dims behind it.<br>
+  <strong>State 2:</strong> AI returns a suggestion with a brief reason. User accepts or picks manually.<br>
+  <strong>State 3:</strong> Template locked in, suggestion panel collapses to slim bar. If AI could extract the competitor/target from the description, it pre-fills the variable field (with an "auto-filled" badge). PDF upload is the only thing left.
+</p>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Document to Deck — Polished UI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: "#1E1B4B",
+          "primary-hover": "#16134a",
+          "primary-tint": "#EEF2FF",
+          "primary-muted": "#6366F1",
+          emerald: "#059669",
+          "emerald-bg": "#ECFDF5",
+          surface: "#FFFFFF",
+          canvas: "#F9FAFB",
+          "surface-low": "#F3F4F6",
+          border: "#E5E7EB",
+          "text-primary": "#111827",
+          "text-secondary": "#6B7280",
+          "text-muted": "#9CA3AF",
+        },
+        fontFamily: {
+          display: ["Newsreader", "Georgia", "serif"],
+          body: ["Switzer", "Inter", "sans-serif"],
+        },
+        borderRadius: {
+          DEFAULT: "0px",
+          sm: "2px",
+          md: "4px",
+          lg: "6px",
+          full: "999px",
+        },
+        boxShadow: {
+          card: "0 20px 40px -10px rgba(30,27,75,0.06)",
+          float: "0 12px 40px -12px rgba(30,27,75,0.12)",
+        },
+      },
+    },
+  }
+</script>
+<style>
+  body { font-family: 'Switzer', 'Inter', sans-serif; background: #F9FAFB; }
+  .toggle-on  { background: #1E1B4B; color: #fff; }
+  .toggle-off { background: #E5E7EB; color: #9CA3AF; }
+  .tab-active { background: #1E1B4B; color: #fff; font-weight: 600; }
+  .tab-idle   { background: #F3F4F6; color: #374151; }
+  .tab-suggest{ background: #059669; color: #fff; font-weight: 600; }
+</style>
+</head>
+<body class="min-h-screen flex items-start justify-center py-12 px-4 gap-8">
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 1 — LANDING / TEMPLATE SELECTED
+════════════════════════════════════════════ -->
+<div class="w-[520px] flex flex-col gap-3">
+  <p class="text-xs font-body font-semibold uppercase tracking-widest text-text-muted">Screen 1 — Generation (Custom Build)</p>
+
+  <div class="bg-white shadow-card w-full p-8 flex flex-col gap-6">
+
+    <!-- Hero -->
+    <div class="flex flex-col gap-1">
+      <h1 class="font-display text-3xl font-medium tracking-tight text-text-primary leading-tight">Turn Research<br>Into a Deck</h1>
+      <p class="text-text-secondary text-sm leading-relaxed mt-1">Upload your PDF, pick a template, and let AI do the rest.</p>
+    </div>
+
+    <!-- Entry banners -->
+    <div class="flex gap-3">
+      <!-- Quick Generate -->
+      <div class="flex-1 bg-primary text-white p-4 cursor-pointer hover:bg-primary-hover transition-colors">
+        <p class="text-[10px] font-semibold uppercase tracking-widest opacity-60 mb-1">⚡ Quick Generate</p>
+        <p class="text-sm font-semibold leading-snug mb-1">Describe your goal, AI handles the rest</p>
+        <p class="text-[11px] opacity-70 leading-relaxed">AI suggests the right template and fills the details.</p>
+        <div class="mt-3 bg-white/20 text-white text-xs font-semibold py-1.5 text-center">
+          Click to start →
+        </div>
+      </div>
+      <!-- Custom Build -->
+      <div class="flex-1 border border-primary text-primary p-4 cursor-pointer hover:bg-primary-tint transition-colors">
+        <p class="text-[10px] font-semibold uppercase tracking-widest opacity-50 mb-1">🎛 Custom Build</p>
+        <p class="text-sm font-semibold leading-snug mb-1">Pick a template, set your target, upload</p>
+        <p class="text-[11px] opacity-65 leading-relaxed">Select from the library and configure before generating.</p>
+        <div class="mt-3 bg-primary text-white text-xs font-semibold py-1.5 text-center">
+          Browse templates →
+        </div>
+      </div>
+    </div>
+
+    <!-- Template row -->
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">Template</span>
+        <span class="text-[10px] font-semibold text-primary border border-primary px-2 py-0.5 cursor-pointer hover:bg-primary-tint transition-colors">+ Add Template</span>
+      </div>
+      <div class="flex flex-wrap gap-1.5">
+        <button class="tab-suggest text-[11px] px-3 py-1.5 cursor-pointer">✦ Suggest</button>
+        <button class="tab-active text-[11px] px-3 py-1.5 cursor-pointer">✓ Competitor Battlecard</button>
+        <button class="tab-idle text-[11px] px-3 py-1.5 cursor-pointer">Industry Pitch Deck</button>
+        <button class="tab-idle text-[11px] px-3 py-1.5 cursor-pointer">Executive Summary</button>
+      </div>
+    </div>
+
+    <!-- Variable field — label adapts to selected template -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">Competitor Name</label>
+      <input
+        type="text"
+        placeholder="e.g. Sauce Labs"
+        class="w-full bg-canvas border border-border px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+      />
+      <p class="text-[10px] text-text-muted">This name appears as the comparison target across all slides.</p>
+    </div>
+
+    <!-- PDF Upload -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">Research PDF</label>
+      <div class="border-2 border-dashed border-border bg-canvas px-6 py-8 text-center cursor-pointer hover:border-primary hover:bg-primary-tint transition-colors group">
+        <p class="text-sm text-text-muted group-hover:text-primary transition-colors">Drop PDF here or <span class="underline font-medium">click to browse</span></p>
+      </div>
+    </div>
+
+    <!-- Generate CTA -->
+    <button class="w-full bg-primary text-white font-semibold text-sm py-3.5 hover:bg-primary-hover transition-colors">
+      Generate Deck →
+    </button>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 2 — SUGGEST TEMPLATE FLOW (State 2)
+════════════════════════════════════════════ -->
+<div class="w-[520px] flex flex-col gap-3">
+  <p class="text-xs font-body font-semibold uppercase tracking-widest text-text-muted">Screen 2 — Quick Generate (AI Suggestion)</p>
+
+  <div class="bg-white shadow-card w-full p-8 flex flex-col gap-6">
+
+    <!-- Hero -->
+    <div class="flex flex-col gap-1">
+      <h1 class="font-display text-3xl font-medium tracking-tight text-text-primary leading-tight">Turn Research<br>Into a Deck</h1>
+      <p class="text-text-secondary text-sm leading-relaxed mt-1">Upload your PDF, pick a template, and let AI do the rest.</p>
+    </div>
+
+    <!-- Quick Generate active state — slim bar -->
+    <div class="bg-primary text-white px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-semibold uppercase tracking-widest opacity-60">⚡ Quick Generate</span>
+        <span class="text-[11px] font-semibold opacity-90">active</span>
+      </div>
+      <span class="text-[11px] opacity-50 cursor-pointer hover:opacity-80">✕ cancel</span>
+    </div>
+
+    <!-- Natural language input -->
+    <div class="border border-primary p-4 flex flex-col gap-3 bg-primary-tint/30">
+      <label class="text-[10px] font-semibold uppercase tracking-widest text-primary">What do you need?</label>
+      <div class="bg-white border border-border px-3 py-2.5 text-sm text-text-primary italic leading-relaxed">
+        "Compare BrowserStack vs Sauce Labs for an enterprise fintech prospect..."
+      </div>
+      <div class="flex justify-end">
+        <button class="bg-primary text-white text-xs font-semibold px-4 py-2 hover:bg-primary-hover transition-colors">Suggest →</button>
+      </div>
+    </div>
+
+    <!-- AI Suggestion result -->
+    <div class="border border-emerald p-4 flex flex-col gap-3 bg-emerald-bg/40">
+      <div class="flex items-center gap-2">
+        <span class="bg-emerald text-white text-[10px] font-bold px-2 py-0.5">✦ Suggested</span>
+        <span class="font-display text-base font-semibold text-text-primary">Competitor Battlecard</span>
+      </div>
+      <p class="text-[12px] text-text-secondary leading-relaxed">
+        Your description mentions a head-to-head comparison with Sauce Labs for an enterprise prospect — the Competitor Battlecard template is built exactly for this.
+      </p>
+      <div class="flex gap-2">
+        <button class="flex-1 bg-primary text-white text-xs font-semibold py-2.5 text-center hover:bg-primary-hover transition-colors">Use this template →</button>
+        <button class="border border-border text-text-secondary text-xs font-medium px-4 py-2.5 hover:border-primary hover:text-primary transition-colors">Pick another</button>
+      </div>
+    </div>
+
+    <!-- Template row still accessible below -->
+    <div class="flex flex-col gap-2 opacity-50">
+      <span class="text-[10px] font-semibold uppercase tracking-widest text-text-muted">Or pick manually</span>
+      <div class="flex flex-wrap gap-1.5">
+        <button class="tab-idle text-[11px] px-3 py-1.5">Competitor Battlecard</button>
+        <button class="tab-idle text-[11px] px-3 py-1.5">Industry Pitch Deck</button>
+        <button class="tab-idle text-[11px] px-3 py-1.5">Executive Summary</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 3 — TEMPLATE SETUP (Power User)
+════════════════════════════════════════════ -->
+<div class="w-[520px] flex flex-col gap-3">
+  <p class="text-xs font-body font-semibold uppercase tracking-widest text-text-muted">Screen 3 — Template Setup (Power User)</p>
+
+  <div class="bg-white shadow-card w-full p-8 flex flex-col gap-6">
+
+    <!-- Back nav + title -->
+    <div class="flex items-center gap-3">
+      <span class="text-text-muted text-sm cursor-pointer hover:text-primary transition-colors">← Back</span>
+      <h2 class="font-display text-2xl font-medium tracking-tight text-text-primary">New Template</h2>
+    </div>
+
+    <!-- Template name -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">Template Name</label>
+      <input type="text" placeholder="e.g. Industry Targeted Comparison"
+        class="w-full bg-canvas border border-border px-3 py-2.5 text-sm placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"/>
+    </div>
+
+    <!-- Slides URL -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">Google Slides Template</label>
+      <div class="flex gap-2">
+        <input type="text" placeholder="Paste Google Slides URL or ID"
+          class="flex-1 bg-canvas border border-border px-3 py-2.5 text-sm placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"/>
+        <button class="bg-primary text-white text-xs font-semibold px-4 whitespace-nowrap hover:bg-primary-hover transition-colors">Load Slides →</button>
+      </div>
+      <p class="text-[10px] text-text-muted">We'll fetch the slide structure from your template deck.</p>
+    </div>
+
+    <!-- Variable definition -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">Target Variable</label>
+      <div class="flex gap-2">
+        <div class="flex-1 flex flex-col gap-1">
+          <span class="text-[10px] text-text-muted">Label shown to users</span>
+          <input type="text" placeholder="e.g. Client Industry"
+            class="w-full bg-canvas border border-border px-3 py-2.5 text-sm placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"/>
+        </div>
+        <div class="flex-1 flex flex-col gap-1">
+          <span class="text-[10px] text-text-muted">Placeholder hint</span>
+          <input type="text" placeholder="e.g. Fintech, Healthcare..."
+            class="w-full bg-canvas border border-border px-3 py-2.5 text-sm placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide defaults -->
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <label class="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">Slides — Set Defaults</label>
+        <span class="text-[10px] text-text-muted">Toggle off slides hidden by default</span>
+      </div>
+      <div class="flex flex-col gap-1">
+        <!-- Slide row — ON -->
+        <div class="flex items-center justify-between px-3 py-2.5 bg-canvas">
+          <div>
+            <span class="text-sm font-medium text-text-primary">Cover Slide</span>
+            <span class="text-[11px] text-text-muted ml-2">Slide 1</span>
+          </div>
+          <button class="toggle-on text-[10px] font-semibold px-3 py-1 cursor-pointer">On</button>
+        </div>
+        <!-- Slide row — ON -->
+        <div class="flex items-center justify-between px-3 py-2.5">
+          <div>
+            <span class="text-sm font-medium text-text-primary">Competitive Overview</span>
+            <span class="text-[11px] text-text-muted ml-2">Slide 2</span>
+          </div>
+          <button class="toggle-on text-[10px] font-semibold px-3 py-1 cursor-pointer">On</button>
+        </div>
+        <!-- Slide row — OFF -->
+        <div class="flex items-center justify-between px-3 py-2.5 bg-canvas">
+          <div>
+            <span class="text-sm font-medium text-text-muted">Pricing Breakdown</span>
+            <span class="text-[11px] text-text-muted ml-2">Slide 5</span>
+          </div>
+          <button class="toggle-off text-[10px] font-semibold px-3 py-1 cursor-pointer">Off</button>
+        </div>
+        <!-- Slide row — OFF -->
+        <div class="flex items-center justify-between px-3 py-2.5">
+          <div>
+            <span class="text-sm font-medium text-text-muted">Competitive Pricing</span>
+            <span class="text-[11px] text-text-muted ml-2">Slide 6</span>
+          </div>
+          <button class="toggle-off text-[10px] font-semibold px-3 py-1 cursor-pointer">Off</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save -->
+    <button class="w-full bg-primary text-white font-semibold text-sm py-3.5 hover:bg-primary-hover transition-colors">
+      Save Template
+    </button>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<h2>Refined Layout — Banners as Entry Points + Single Dynamic Variable</h2>
+<p class="subtitle">Clicking a banner starts the path. Variable label adapts to the selected template.</p>
+
+<div class="split">
+
+  <!-- STATE 1: Default / no template selected -->
+  <div class="mockup">
+    <div class="mockup-header">State 1 — Landing (no template selected)</div>
+    <div class="mockup-body" style="background:#F9FAFB;padding:20px;font-family:sans-serif">
+
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:18px;font-weight:700;color:#1E1B4B;margin-bottom:4px">Turn Research Into a Deck</div>
+        <div style="font-size:12px;color:#6B7280">Upload a PDF, pick a template, and let AI do the rest.</div>
+      </div>
+
+      <!-- Clickable banners = entry points -->
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <div style="flex:1;background:#1E1B4B;color:#fff;padding:12px 14px;border-radius:6px;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <div style="font-size:10px;opacity:0.7;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px">⚡ Quick Generate</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:3px">Describe your goal, AI handles the rest</div>
+          <div style="font-size:10px;opacity:0.7;margin-bottom:8px">AI suggests the right template, fills variables, decides which slides to include.</div>
+          <div style="background:rgba(255,255,255,0.2);border-radius:4px;padding:5px 10px;text-align:center;font-size:11px;font-weight:600">Click to start →</div>
+        </div>
+        <div style="flex:1;background:#fff;border:1.5px solid #1E1B4B;color:#1E1B4B;padding:12px 14px;border-radius:6px;cursor:pointer" onmouseover="this.style.background='#F0F0FF'" onmouseout="this.style.background='#fff'">
+          <div style="font-size:10px;opacity:0.6;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px">🎛 Custom Build</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:3px">Pick a template, set your target, choose slides</div>
+          <div style="font-size:10px;opacity:0.65;margin-bottom:8px">Select from the template library and configure each detail before generating.</div>
+          <div style="background:#1E1B4B;color:#fff;border-radius:4px;padding:5px 10px;text-align:center;font-size:11px;font-weight:600">Browse templates →</div>
+        </div>
+      </div>
+
+      <!-- Template row (always visible, but highlighted on Custom Build click) -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:10px;opacity:0.5">
+        <div style="font-size:10px;color:#9CA3AF;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Or pick a template directly</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Competitor Battlecard</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Industry Pitch Deck</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Executive Summary</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STATE 2: Template selected (Competitor Battlecard) → variable label adapts -->
+  <div class="mockup">
+    <div class="mockup-header">State 2 — Template Selected (Battlecard shown)</div>
+    <div class="mockup-body" style="background:#F9FAFB;padding:20px;font-family:sans-serif">
+
+      <!-- Banners collapse to a slim indicator -->
+      <div style="display:flex;gap:6px;margin-bottom:16px;align-items:center">
+        <div style="background:#1E1B4B;color:#fff;padding:4px 10px;border-radius:4px;font-size:11px">🎛 Custom Build</div>
+        <div style="font-size:11px;color:#9CA3AF">Template selected: <strong style="color:#1E1B4B">Competitor Battlecard</strong></div>
+        <div style="margin-left:auto;font-size:11px;color:#6B7280;text-decoration:underline;cursor:pointer">Change</div>
+      </div>
+
+      <!-- Template row (now shows selected state) -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">Template</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="background:#1E1B4B;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600">✓ Competitor Battlecard</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Industry Pitch Deck</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Executive Summary</div>
+        </div>
+      </div>
+
+      <!-- Single dynamic variable — label adapts to template -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Competitor Name</div>
+        <input class="mock-input" placeholder="e.g. Sauce Labs" style="width:100%;box-sizing:border-box"/>
+        <div style="font-size:10px;color:#9CA3AF;margin-top:4px">This appears as the comparison target across all slides.</div>
+      </div>
+
+      <!-- PDF Upload -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Research PDF</div>
+        <div style="border:1.5px dashed #D1D5DB;border-radius:4px;padding:16px;text-align:center;font-size:12px;color:#9CA3AF">Drop PDF here or click to browse</div>
+      </div>
+
+      <!-- Slides with Let AI Decide -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Slides</div>
+          <div style="font-size:11px;color:#059669;font-weight:600;cursor:pointer">✦ Let AI Decide</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:#F9FAFB;border-radius:3px;font-size:11px;color:#374151">
+            <span>Cover Slide</span><span style="background:#1E1B4B;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px">On</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:#F9FAFB;border-radius:3px;font-size:11px;color:#374151">
+            <span>Competitive Overview</span><span style="background:#1E1B4B;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px">On</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:#F9FAFB;border-radius:3px;font-size:11px;color:#9CA3AF">
+            <span>Pricing Breakdown</span><span style="background:#E5E7EB;color:#9CA3AF;padding:2px 8px;border-radius:10px;font-size:10px">Off</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#1E1B4B;color:#fff;padding:10px;border-radius:6px;text-align:center;font-size:13px;font-weight:600;cursor:pointer">
+        Generate Deck →
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">
+  <strong>Left:</strong> Landing state — banners are clickable entry points. Quick Generate opens a natural language dialog; Custom Build highlights the template row. <br><br>
+  <strong>Right:</strong> After template selection — banners collapse to a slim status bar, single variable field adapts its label ("Competitor Name" for Battlecard, would show "Client Industry" for Pitch Deck), rest of form unlocks.
+</p>

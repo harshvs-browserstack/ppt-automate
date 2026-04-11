@@ -215,6 +215,7 @@ async def run_ai_content_population(
     pdf_filename: str,
     competitor: str,
     config: Config,
+    slides_id: Optional[str] = None,
     excluded_slide_numbers: Optional[List[int]] = None,
     template_view_pdf_name: Optional[str] = None,
     on_status: Optional[Callable[[str, float, Optional[str]], None]] = None,
@@ -231,6 +232,7 @@ async def run_ai_content_population(
         pdf_filename: Name of the PDF file
         competitor: Competitor name for content generation
         config: Config dataclass with API keys and service IDs
+        slides_id: Optional Google Slides deck ID to clone. If not provided, falls back to ORIGINAL_SLIDES_ID env var
         excluded_slide_numbers: List of slide numbers to skip (default: None)
         template_view_pdf_name: Name of the template PDF for reference (default: pdf_filename)
         on_status: Optional callback for status updates (receives status string)
@@ -270,9 +272,15 @@ async def run_ai_content_population(
 
             # Step 1b: Set ORIGINAL_SLIDES_ID, FOLDER_DRIVE_ID, and SERVICE_ACCOUNT_EMAIL in Apps Script
             print("[1b/7] Configuring Apps Script properties...")
+            effective_slides_id = slides_id or config.original_slides_id
+            if not effective_slides_id:
+                raise ValueError(
+                    "No slides_id provided and ORIGINAL_SLIDES_ID env var is not set. "
+                    "Select a template or set ORIGINAL_SLIDES_ID."
+                )
             await _set_apps_script_property(
                 client_httpx, config.gas_web_app_url,
-                "ORIGINAL_SLIDES_ID", config.original_slides_id
+                "ORIGINAL_SLIDES_ID", effective_slides_id
             )
             await _set_apps_script_property(
                 client_httpx, config.gas_web_app_url,

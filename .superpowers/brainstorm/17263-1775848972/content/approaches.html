@@ -1,0 +1,92 @@
+<h2>Three Approaches to the Input + Template Flow</h2>
+<p class="subtitle">How do we expose "regular user" vs "power user" modes — and where does template selection live?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f4ff;padding:16px;font-size:12px;font-family:monospace;color:#1E1B4B;line-height:1.6">
+      <div style="background:#fff;border:1px solid #ddd;border-radius:4px;padding:10px;margin-bottom:8px">
+        <div style="font-size:10px;color:#888;margin-bottom:4px">DESCRIBE YOUR GOAL</div>
+        <div style="background:#f5f5f5;padding:6px;border-radius:3px;color:#555;font-size:11px">"Compare BrowserStack vs Sauce Labs for enterprise..."</div>
+      </div>
+      <div style="background:#fff;border:1px solid #ddd;border-radius:4px;padding:10px;margin-bottom:8px">
+        <div style="font-size:10px;color:#888;margin-bottom:4px">UPLOAD RESEARCH PDF</div>
+        <div style="background:#f5f5f5;padding:6px;border-radius:3px;color:#999;font-size:11px">Drop file here</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div style="background:#1E1B4B;color:#fff;padding:6px 12px;border-radius:3px;font-size:10px;flex:1;text-align:center">Generate →</div>
+        <div style="background:#fff;border:1px solid #1E1B4B;color:#1E1B4B;padding:6px 12px;border-radius:3px;font-size:10px">⚙ Advanced</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Progressive Disclosure</h3>
+      <p>Single screen. Regular users describe + upload and go. "Advanced" toggle reveals template picker, variable fields, and slide toggles. Always feels simple unless you need control.</p>
+      <div class="pros-cons" style="margin-top:8px">
+        <div class="pros"><h4>Pros</h4><ul><li>Lowest friction for new users</li><li>One screen, no wizard steps</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Power features feel hidden</li><li>Advanced panel can get crowded</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f4ff;padding:16px;font-size:12px;font-family:monospace;color:#1E1B4B;line-height:1.6">
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <div style="flex:1;background:#1E1B4B;color:#fff;padding:10px;border-radius:4px;text-align:center;font-size:11px">
+          <div style="font-size:16px;margin-bottom:4px">⚡</div>
+          <strong>Quick Generate</strong>
+          <div style="font-size:10px;opacity:0.8;margin-top:4px">Describe + upload, AI handles template &amp; slides</div>
+        </div>
+        <div style="flex:1;background:#fff;border:1px solid #1E1B4B;color:#1E1B4B;padding:10px;border-radius:4px;text-align:center;font-size:11px">
+          <div style="font-size:16px;margin-bottom:4px">🎛</div>
+          <strong>Custom Build</strong>
+          <div style="font-size:10px;opacity:0.7;margin-top:4px">Pick template, set variables, choose slides</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #ddd;border-radius:4px;padding:8px;font-size:10px;color:#888;text-align:center">
+        → Each path leads to its own focused screen
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Two-Path Wizard</h3>
+      <p>Users pick their mode upfront: Quick Generate (AI-driven) or Custom Build (full control). Each path is a separate, focused flow. Makes the two user types explicit.</p>
+      <div class="pros-cons" style="margin-top:8px">
+        <div class="pros"><h4>Pros</h4><ul><li>Each path is clean &amp; uncluttered</li><li>Clear mental model</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Extra click for everyone</li><li>Power users always go to same path</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#f0f4ff;padding:16px;font-size:12px;font-family:monospace;color:#1E1B4B;line-height:1.6">
+      <div style="background:#fff;border:1px solid #ddd;border-radius:4px;padding:10px;margin-bottom:8px">
+        <div style="font-size:10px;color:#888;margin-bottom:6px">SELECT TEMPLATE</div>
+        <div style="display:flex;gap:6px">
+          <div style="background:#1E1B4B;color:#fff;padding:4px 8px;border-radius:3px;font-size:10px">Battlecard</div>
+          <div style="background:#f5f5f5;color:#555;padding:4px 8px;border-radius:3px;font-size:10px">Pitch Deck</div>
+          <div style="background:#f5f5f5;color:#555;padding:4px 8px;border-radius:3px;font-size:10px">+ Suggest</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #ddd;border-radius:4px;padding:10px;margin-bottom:8px">
+        <div style="font-size:10px;color:#888;margin-bottom:4px">FILL VARIABLES</div>
+        <div style="display:flex;gap:6px">
+          <div style="flex:1;background:#f5f5f5;padding:4px;border-radius:3px;font-size:10px;color:#999">{competitor}</div>
+          <div style="flex:1;background:#f5f5f5;padding:4px;border-radius:3px;font-size:10px;color:#999">{client}</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #ddd;border-radius:4px;padding:6px;font-size:10px;color:#888">
+        Upload PDF + slide toggles appear below
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Template-First</h3>
+      <p>Template selection is always the first step. "Suggest Template" button is right there alongside manual picks. Selecting a template reveals its variables and slide list. Natural language input lives in the Suggest flow.</p>
+      <div class="pros-cons" style="margin-top:8px">
+        <div class="pros"><h4>Pros</h4><ul><li>Variables &amp; slides are template-specific — logical order</li><li>Suggest button is always visible, not buried</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Regular users still see template names even if AI picks</li><li>More upfront UI complexity</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">My recommendation: <strong>C — Template-First</strong>, because variables and skippable slides are template-specific — they only make sense after a template is selected. The "Suggest Template" button is front-and-center, not hidden. Regular users click Suggest, describe their goal, done. Power users pick manually.</p>

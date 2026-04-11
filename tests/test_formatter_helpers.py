@@ -58,3 +58,13 @@ def test_merge_ai_output_last_wins_on_duplicate_placeholder():
     ]
     result = _merge_ai_output_with_template(original, ai_data)
     assert result.loc[result["placeholderId"] == "p1", "contentRuns"].iloc[0] == [{"text": "Last"}]
+
+
+def test_run_ai_content_population_signature_accepts_slides_id():
+    """run_ai_content_population must accept a slides_id keyword argument."""
+    import inspect
+    from core.formatter_pipeline import run_ai_content_population
+    sig = inspect.signature(run_ai_content_population)
+    assert "slides_id" in sig.parameters
+    # slides_id should be optional (has a default)
+    assert sig.parameters["slides_id"].default is None

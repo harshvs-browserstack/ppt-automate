@@ -1,0 +1,135 @@
+<h2>Template Row + Template Setup Screen</h2>
+<p class="subtitle">+ Add Template entry point in the template row; setup screen configures defaults once</p>
+
+<div class="split">
+
+  <!-- LEFT: Main screen template row with + Add Template -->
+  <div class="mockup">
+    <div class="mockup-header">Main Screen — Template Row (updated)</div>
+    <div class="mockup-body" style="background:#F9FAFB;padding:20px;font-family:sans-serif">
+
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Select Template</div>
+          <!-- Power user entry point -->
+          <div style="font-size:11px;color:#1E1B4B;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;border:1px solid #1E1B4B;padding:3px 10px;border-radius:4px">
+            + Add Template
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="background:#059669;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600">✦ Suggest Template</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Competitor Battlecard</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Industry Pitch Deck</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Executive Summary</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;padding:12px;background:#EEF2FF;border-radius:6px;border-left:3px solid #1E1B4B">
+        <div style="font-size:11px;font-weight:600;color:#1E1B4B;margin-bottom:4px">Who sees "+ Add Template"?</div>
+        <div style="font-size:11px;color:#4B5563">Visible only to power users (designated template managers). Regular users see the template row without it.</div>
+      </div>
+
+      <div style="margin-top:16px;padding:12px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:6px">
+        <div style="font-size:10px;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Hover state on existing template tile</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div style="background:#1E1B4B;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600;position:relative">
+            Competitor Battlecard
+            <span style="margin-left:8px;opacity:0.6;font-size:10px">✎</span>
+          </div>
+          <div style="font-size:10px;color:#9CA3AF">← hover reveals edit icon (power users only)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: Template setup screen -->
+  <div class="mockup">
+    <div class="mockup-header">Template Setup Screen</div>
+    <div class="mockup-body" style="background:#F9FAFB;padding:20px;font-family:sans-serif">
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <div style="font-size:12px;color:#6B7280;cursor:pointer">← Back</div>
+        <div style="font-size:16px;font-weight:700;color:#1E1B4B">New Template</div>
+      </div>
+
+      <!-- Template name -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:10px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Template Name</div>
+        <input class="mock-input" placeholder="e.g. Industry Targeted Comparison" style="width:100%;box-sizing:border-box"/>
+      </div>
+
+      <!-- Google Slides template ID -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:10px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Google Slides Template</div>
+        <input class="mock-input" placeholder="Paste Google Slides URL or ID" style="width:100%;box-sizing:border-box;margin-bottom:6px"/>
+        <button class="mock-button" style="font-size:11px;padding:5px 12px">Load Slides →</button>
+        <div style="font-size:10px;color:#9CA3AF;margin-top:6px">We'll fetch the slide structure from your template deck.</div>
+      </div>
+
+      <!-- Variable definition -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:10px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Target Variable</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="flex:1">
+            <div style="font-size:10px;color:#9CA3AF;margin-bottom:4px">Label (shown to users)</div>
+            <input class="mock-input" placeholder="e.g. Client Industry" style="width:100%;box-sizing:border-box"/>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:10px;color:#9CA3AF;margin-bottom:4px">Placeholder hint</div>
+            <input class="mock-input" placeholder="e.g. Fintech, Healthcare..." style="width:100%;box-sizing:border-box"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slides — loaded from template, set defaults -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Slides — Set Defaults</div>
+          <div style="font-size:10px;color:#9CA3AF">Turn off slides that shouldn't appear by default</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#F9FAFB;border-radius:3px;font-size:11px;color:#374151">
+            <div>
+              <span style="font-weight:500">Cover Slide</span>
+              <span style="font-size:10px;color:#9CA3AF;margin-left:6px">Slide 1</span>
+            </div>
+            <span style="background:#1E1B4B;color:#fff;padding:2px 10px;border-radius:10px;font-size:10px;cursor:pointer">On</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#F9FAFB;border-radius:3px;font-size:11px;color:#374151">
+            <div>
+              <span style="font-weight:500">Industry Overview</span>
+              <span style="font-size:10px;color:#9CA3AF;margin-left:6px">Slide 2</span>
+            </div>
+            <span style="background:#1E1B4B;color:#fff;padding:2px 10px;border-radius:10px;font-size:10px;cursor:pointer">On</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#F9FAFB;border-radius:3px;font-size:11px;color:#9CA3AF">
+            <div>
+              <span style="font-weight:500">Pricing Breakdown</span>
+              <span style="font-size:10px;color:#C4C4C4;margin-left:6px">Slide 5</span>
+            </div>
+            <span style="background:#E5E7EB;color:#9CA3AF;padding:2px 10px;border-radius:10px;font-size:10px;cursor:pointer">Off</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:#F9FAFB;border-radius:3px;font-size:11px;color:#9CA3AF">
+            <div>
+              <span style="font-weight:500">Competitive Pricing</span>
+              <span style="font-size:10px;color:#C4C4C4;margin-left:6px">Slide 6</span>
+            </div>
+            <span style="background:#E5E7EB;color:#9CA3AF;padding:2px 10px;border-radius:10px;font-size:10px;cursor:pointer">Off</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="mock-button" style="width:100%;box-sizing:border-box;padding:10px;font-size:13px;font-weight:600;background:#1E1B4B;color:#fff;border:none;border-radius:6px;cursor:pointer">
+        Save Template
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">
+  <strong>Left:</strong> "+ Add Template" sits top-right of the template row (power users only). Hovering an existing tile reveals an edit icon.<br><br>
+  <strong>Right:</strong> Setup screen — name, paste Slides URL/ID → "Load Slides" fetches structure from GAS. One variable definition (label + hint). Slide list shows all slides from the template; power user sets which are On/Off by default. End users see these defaults at generation time and can still adjust.
+</p>

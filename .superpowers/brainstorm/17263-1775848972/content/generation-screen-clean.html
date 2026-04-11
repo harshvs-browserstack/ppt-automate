@@ -1,0 +1,67 @@
+<h2>Generation Screen — Clean End-User View</h2>
+<p class="subtitle">Slides are pre-configured in the template. End users just pick, fill, upload, go.</p>
+
+<div style="max-width:480px;margin:0 auto">
+  <div class="mockup">
+    <div class="mockup-header">Main Screen — After Template Selected</div>
+    <div class="mockup-body" style="background:#F9FAFB;padding:24px;font-family:sans-serif">
+
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:20px;font-weight:700;color:#1E1B4B;margin-bottom:6px">Turn Research Into a Deck</div>
+        <div style="font-size:12px;color:#6B7280">Upload a PDF, pick a template, and let AI do the rest.</div>
+      </div>
+
+      <!-- Entry banners -->
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <div style="flex:1;background:#1E1B4B;color:#fff;padding:12px 14px;border-radius:6px;cursor:pointer">
+          <div style="font-size:10px;opacity:0.7;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px">⚡ Quick Generate</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:3px">Describe your goal, AI handles the rest</div>
+          <div style="font-size:10px;opacity:0.7">AI suggests the right template and fills the details.</div>
+        </div>
+        <div style="flex:1;background:#fff;border:1.5px solid #1E1B4B;color:#1E1B4B;padding:12px 14px;border-radius:6px;cursor:pointer">
+          <div style="font-size:10px;opacity:0.6;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px">🎛 Custom Build</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:3px">Pick a template, set your target, upload</div>
+          <div style="font-size:10px;opacity:0.65">Select from the library and configure before generating.</div>
+        </div>
+      </div>
+
+      <!-- Template selection -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">Template</div>
+          <div style="font-size:10px;color:#1E1B4B;font-weight:600;border:1px solid #1E1B4B;padding:2px 8px;border-radius:4px;cursor:pointer">+ Add Template</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="background:#059669;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600">✦ Suggest</div>
+          <div style="background:#1E1B4B;color:#fff;padding:6px 12px;border-radius:4px;font-size:11px;font-weight:600">✓ Competitor Battlecard</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Industry Pitch Deck</div>
+          <div style="background:#F3F4F6;color:#374151;padding:6px 12px;border-radius:4px;font-size:11px">Executive Summary</div>
+        </div>
+      </div>
+
+      <!-- Single dynamic variable -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:10px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Competitor Name</div>
+        <input class="mock-input" placeholder="e.g. Sauce Labs" style="width:100%;box-sizing:border-box"/>
+      </div>
+
+      <!-- PDF Upload -->
+      <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:14px;margin-bottom:20px">
+        <div style="font-size:10px;color:#6B7280;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Research PDF</div>
+        <div style="border:1.5px dashed #D1D5DB;border-radius:4px;padding:20px;text-align:center;font-size:12px;color:#9CA3AF;cursor:pointer">
+          Drop PDF here or click to browse
+        </div>
+      </div>
+
+      <!-- Generate -->
+      <div style="background:#1E1B4B;color:#fff;padding:12px;border-radius:6px;text-align:center;font-size:14px;font-weight:600;cursor:pointer">
+        Generate Deck →
+      </div>
+
+    </div>
+  </div>
+
+  <div style="margin-top:16px;padding:12px;background:#EEF2FF;border-radius:6px;border-left:3px solid #1E1B4B;font-size:12px;color:#374151">
+    <strong>What end users never see:</strong> slide toggles, slide counts, template internals. That's all handled at template setup. The generation screen is: pick template → fill one field → upload PDF → go.
+  </div>
+</div>
