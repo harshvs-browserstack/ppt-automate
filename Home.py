@@ -60,7 +60,7 @@ if st.session_state.app_state == "input":
     # ── Hero ───────────────────────────────────────────────────────────────
     st.markdown(
         '<h1 style="font-family:\'Newsreader\',serif;font-size:2rem;font-weight:600;'
-        'color:#111827;margin-bottom:0.25rem">Turn Research Into a Deck</h1>',
+        'color:#A78BFA;margin-bottom:0.25rem">Turn Research Into a Deck</h1>',
         unsafe_allow_html=True,
     )
     st.caption("Upload your PDF, pick a template, and let AI do the rest.")
