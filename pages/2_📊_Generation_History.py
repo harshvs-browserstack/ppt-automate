@@ -5,6 +5,7 @@ Displays a log of every slide created with timestamps, templates, and links.
 import streamlit as st
 from core.config import get_config
 from core.auth_helpers import get_sheets_service
+from core.cache import get_history_cache, set_history_cache, invalidate_history_cache
 import pandas as pd
 import pathlib
 
@@ -25,86 +26,103 @@ st.markdown(
 st.caption("All slide generations logged here for audit trail and reference.")
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Load history from sheet
+# Load history from sheet (or cache)
 history_sheet_id = config.history_sheet_id
 
 if not history_sheet_id or history_sheet_id == "-":
     st.info("History tracking not configured. Set HISTORY_SHEET_ID to enable.")
     st.stop()
 
-try:
-    service = get_sheets_service(config.gdrive_credentials_path)
+# Check cache first
+cached_df = get_history_cache()
+if cached_df is not None:
+    df = cached_df
+    st.success("📦 Loaded from cache (refreshes hourly)")
+else:
+    # Cache miss or stale — fetch from Sheets
+    try:
+        service = get_sheets_service(config.gdrive_credentials_path)
 
-    # Fetch data from Generations sheet
-    result = service.spreadsheets().values().get(
-        spreadsheetId=history_sheet_id,
-        range="Generations!A:F"
-    ).execute()
+        # Fetch data from Generations sheet
+        result = service.spreadsheets().values().get(
+            spreadsheetId=history_sheet_id,
+            range="Generations!A:F"
+        ).execute()
 
-    rows = result.get("values", [])
+        rows = result.get("values", [])
 
-    if not rows or len(rows) < 2:
-        st.info("No generations yet. Create your first deck to start building history.")
+        if not rows or len(rows) < 2:
+            st.info("No generations yet. Create your first deck to start building history.")
+            st.stop()
+
+        # Convert to DataFrame
+        headers = rows[0]
+        data = rows[1:]
+        df = pd.DataFrame(data, columns=headers)
+
+        # Store in cache
+        set_history_cache(df)
+
+    except Exception as e:
+        st.error(f"Could not load history: {e}")
+        st.info(f"Make sure HISTORY_SHEET_ID is set correctly and the service account has access to the sheet.")
         st.stop()
 
-    # Convert to DataFrame
-    headers = rows[0]
-    data = rows[1:]
-    df = pd.DataFrame(data, columns=headers)
+# Manual refresh button
+col1, col2 = st.columns([5, 1])
+if col2.button("🔄 Refresh Now", key="btn_refresh_cache"):
+    invalidate_history_cache()
+    st.rerun()
 
-    # Display summary stats
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Total Generations", len(df))
-    with col2:
-        st.metric("Unique Templates", df["Template"].nunique() if "Template" in df.columns else 0)
-    with col3:
-        st.metric("Unique Targets", df["Target Value"].nunique() if "Target Value" in df.columns else 0)
-    with col4:
-        st.metric("Latest Generation", df["Timestamp"].iloc[-1] if len(df) > 0 else "—")
+# Display summary stats
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    st.metric("Total Generations", len(df))
+with col2:
+    st.metric("Unique Templates", df["Template"].nunique() if "Template" in df.columns else 0)
+with col3:
+    st.metric("Unique Targets", df["Target Value"].nunique() if "Target Value" in df.columns else 0)
+with col4:
+    st.metric("Latest Generation", df["Timestamp"].iloc[-1] if len(df) > 0 else "—")
 
-    st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-    # Display full history table with clickable links
-    st.markdown('<div class="section-label">All Generations</div>', unsafe_allow_html=True)
+# Display full history table with clickable links
+st.markdown('<div class="section-label">All Generations</div>', unsafe_allow_html=True)
 
-    # Make Slide URL clickable
-    if "Slide URL" in df.columns:
-        df_display = df.copy()
-        df_display["Slide URL"] = df_display["Slide URL"].apply(
-            lambda url: f'[Open ↗]({url})' if url and url != "N/A" else url
-        )
-
-        # Reorder columns for better readability
-        column_order = [
-            "Timestamp",
-            "Template",
-            "Target Value",
-            "PDF Filename",
-            "Slide URL",
-            "Slide ID"
-        ]
-        df_display = df_display[[col for col in column_order if col in df_display.columns]]
-
-        st.markdown(
-            df_display.to_markdown(index=False),
-            unsafe_allow_html=True
-        )
-    else:
-        st.dataframe(df, use_container_width=True)
-
-    # Export option
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<div class="section-label">Export</div>', unsafe_allow_html=True)
-
-    csv = df.to_csv(index=False)
-    st.download_button(
-        label="📥 Download as CSV",
-        data=csv,
-        file_name="generation_history.csv",
-        mime="text/csv"
+# Make Slide URL clickable
+if "Slide URL" in df.columns:
+    df_display = df.copy()
+    df_display["Slide URL"] = df_display["Slide URL"].apply(
+        lambda url: f'[Open ↗]({url})' if url and url != "N/A" else url
     )
 
-except Exception as e:
-    st.error(f"Could not load history: {e}")
-    st.info(f"Make sure HISTORY_SHEET_ID is set correctly and the service account has access to the sheet.")
+    # Reorder columns for better readability
+    column_order = [
+        "Timestamp",
+        "Template",
+        "Target Value",
+        "PDF Filename",
+        "Slide URL",
+        "Slide ID"
+    ]
+    df_display = df_display[[col for col in column_order if col in df_display.columns]]
+
+    st.markdown(
+        df_display.to_markdown(index=False),
+        unsafe_allow_html=True
+    )
+else:
+    st.dataframe(df, use_container_width=True)
+
+# Export option
+st.markdown("<br>", unsafe_allow_html=True)
+st.markdown('<div class="section-label">Export</div>', unsafe_allow_html=True)
+
+csv = df.to_csv(index=False)
+st.download_button(
+    label="📥 Download as CSV",
+    data=csv,
+    file_name="generation_history.csv",
+    mime="text/csv"
+)
