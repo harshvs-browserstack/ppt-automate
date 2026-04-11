@@ -1,74 +1,5 @@
 [
   {
-    "id": "17730cd2",
-    "name": "Competitor Pitchdeck",
-    "slides_id": "1O8gs6j8b-s90H4BF7lvo7mS60f5htJdfSBIfTwNQfqM",
-    "variable_label": "Competitor Name",
-    "variable_hint": "Sauce Labs",
-    "slides": [
-      {
-        "number": 1,
-        "title": "Slide 1",
-        "enabled": false
-      },
-      {
-        "number": 2,
-        "title": "Slide 2",
-        "enabled": true
-      },
-      {
-        "number": 3,
-        "title": "Slide 3",
-        "enabled": true
-      },
-      {
-        "number": 4,
-        "title": "Slide 4",
-        "enabled": false
-      },
-      {
-        "number": 5,
-        "title": "Slide 5",
-        "enabled": false
-      },
-      {
-        "number": 6,
-        "title": "Slide 6",
-        "enabled": false
-      },
-      {
-        "number": 7,
-        "title": "Slide 7",
-        "enabled": true
-      },
-      {
-        "number": 8,
-        "title": "Slide 8",
-        "enabled": true
-      },
-      {
-        "number": 9,
-        "title": "Slide 9",
-        "enabled": true
-      },
-      {
-        "number": 10,
-        "title": "Slide 10",
-        "enabled": true
-      },
-      {
-        "number": 11,
-        "title": "Slide 11",
-        "enabled": true
-      },
-      {
-        "number": 12,
-        "title": "Slide 12",
-        "enabled": false
-      }
-    ]
-  },
-  {
     "id": "372bf34b",
     "name": "Industry Pitchdeck",
     "slides_id": "1Tk3hh6KvoyroIVAn90TfGPiYylMgKhbLqu6iEBOtS8E",
@@ -148,6 +79,75 @@
       {
         "number": 15,
         "title": "Slide 15",
+        "enabled": false
+      }
+    ]
+  },
+  {
+    "id": "7cff0bbc",
+    "name": "Competitor Comparison - Platform",
+    "slides_id": "1O8gs6j8b-s90H4BF7lvo7mS60f5htJdfSBIfTwNQfqM",
+    "variable_label": "Competitor Name",
+    "variable_hint": "Sauce Labs",
+    "slides": [
+      {
+        "number": 1,
+        "title": "Slide 1",
+        "enabled": false
+      },
+      {
+        "number": 2,
+        "title": "Slide 2",
+        "enabled": true
+      },
+      {
+        "number": 3,
+        "title": "Slide 3",
+        "enabled": true
+      },
+      {
+        "number": 4,
+        "title": "Slide 4",
+        "enabled": false
+      },
+      {
+        "number": 5,
+        "title": "Slide 5",
+        "enabled": false
+      },
+      {
+        "number": 6,
+        "title": "Slide 6",
+        "enabled": false
+      },
+      {
+        "number": 7,
+        "title": "Slide 7",
+        "enabled": true
+      },
+      {
+        "number": 8,
+        "title": "Slide 8",
+        "enabled": true
+      },
+      {
+        "number": 9,
+        "title": "Slide 9",
+        "enabled": true
+      },
+      {
+        "number": 10,
+        "title": "Slide 10",
+        "enabled": true
+      },
+      {
+        "number": 11,
+        "title": "Slide 11",
+        "enabled": true
+      },
+      {
+        "number": 12,
+        "title": "Slide 12",
         "enabled": false
       }
     ]

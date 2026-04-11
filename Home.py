@@ -288,6 +288,7 @@ elif st.session_state.app_state == "loading":
                 config=config,
                 slides_id=slides_id,
                 excluded_slide_numbers=excluded,
+                template_name=selected_template.name if selected_template else None,
                 on_status=on_status,
             )
         )

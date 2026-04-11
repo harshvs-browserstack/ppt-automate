@@ -219,6 +219,7 @@ async def run_ai_content_population(
     slides_id: Optional[str] = None,
     excluded_slide_numbers: Optional[List[int]] = None,
     template_view_pdf_name: Optional[str] = None,
+    template_name: Optional[str] = None,
     on_status: Optional[Callable[[str, float, Optional[str]], None]] = None,
 ) -> str:
     """
@@ -236,6 +237,7 @@ async def run_ai_content_population(
         slides_id: Optional Google Slides deck ID to clone. If not provided, falls back to ORIGINAL_SLIDES_ID env var
         excluded_slide_numbers: List of slide numbers to skip (default: None)
         template_view_pdf_name: Name of the template PDF for reference (default: pdf_filename)
+        template_name: Name of the template used (for history logging, default: None)
         on_status: Optional callback for status updates (receives status string)
 
     Returns:
@@ -485,7 +487,7 @@ async def run_ai_content_population(
                         config.gdrive_credentials_path,
                         config.history_sheet_id,
                         final_url,
-                        template_name=None,
+                        template_name=template_name,
                         target_value=competitor,
                         pdf_filename=pdf_filename,
                     )
