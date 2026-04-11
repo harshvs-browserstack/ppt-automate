@@ -75,6 +75,11 @@ if templates:
             st.session_state.setup_slide_defaults = {
                 s.number: s.enabled for s in t.slides
             }
+            # Clear input widget state so new values can be loaded
+            st.session_state.template_name_input = t.name
+            st.session_state.slides_url_input = t.slides_id
+            st.session_state.var_label_input = t.variable_label
+            st.session_state.var_hint_input = t.variable_hint
             st.rerun()
         if col_delete.button("🗑️", key=f"delete_{t.id}", use_container_width=True):
             # Remove template and save
