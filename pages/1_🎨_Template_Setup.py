@@ -100,18 +100,21 @@ if templates:
 editing = get_template_by_id(templates, st.session_state.setup_editing_id) if st.session_state.setup_editing_id else None
 form_title = f"Edit: {editing.name}" if editing else "New Template"
 
-col_title, col_new = st.columns([5, 1])
+col_title, col_new = st.columns([4.5, 1.5])
 with col_title:
-    st.markdown(f'<div class="section-label">{form_title}</div>', unsafe_allow_html=True)
-if editing and col_new.button("New →", use_container_width=True):
-    st.session_state.setup_editing_id = None
-    st.session_state.setup_slides_loaded = []
-    st.session_state.setup_slide_defaults = {}
-    st.session_state.template_name_input = ""
-    st.session_state.slides_url_input = ""
-    st.session_state.var_label_input = ""
-    st.session_state.var_hint_input = ""
-    st.rerun()
+    st.markdown(f'<div style="font-size:0.875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94A3B8;margin-bottom:1rem">{form_title}</div>', unsafe_allow_html=True)
+with col_new:
+    if editing:
+        st.markdown('<div style="height:0.25rem"></div>', unsafe_allow_html=True)
+        if st.button("New →", use_container_width=True):
+            st.session_state.setup_editing_id = None
+            st.session_state.setup_slides_loaded = []
+            st.session_state.setup_slide_defaults = {}
+            st.session_state.template_name_input = ""
+            st.session_state.slides_url_input = ""
+            st.session_state.var_label_input = ""
+            st.session_state.var_hint_input = ""
+            st.rerun()
 
 template_name = st.text_input(
     label="Template Name",
@@ -178,9 +181,9 @@ if st.session_state.setup_slides_loaded:
 st.markdown('<div style="height:1.5rem"></div>', unsafe_allow_html=True)
 
 # ── Save ───────────────────────────────────────────────────────────────────
-col_save = st.columns([1, 4])[1]  # Right-align the button
+_, col_save = st.columns([1, 4])  # Right-align the button
 with col_save:
-    if st.button("Save Template", type="primary", use_container_width=False):
+    if st.button("Save Template", type="primary", use_container_width=True):
         if not template_name.strip():
             st.error("Template name is required.")
         elif not slides_url.strip():
