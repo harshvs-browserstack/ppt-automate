@@ -27,6 +27,8 @@ if "setup_slide_defaults" not in st.session_state:
     st.session_state.setup_slide_defaults = {}  # {number: bool}
 if "setup_editing_id" not in st.session_state:
     st.session_state.setup_editing_id = None  # template id being edited, or None for new
+if "show_success_banner" not in st.session_state:
+    st.session_state.show_success_banner = False
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────
@@ -39,6 +41,9 @@ def _extract_slides_id(value: str) -> str:
 # ── Page ───────────────────────────────────────────────────────────────────
 st.title("Template Setup")
 st.caption("Create and manage presentation templates.")
+
+# Success banner placeholder (shown at top when template is saved)
+success_banner = st.empty()
 
 templates = load_templates(REGISTRY_PATH)
 
@@ -113,7 +118,7 @@ variable_hint = col_hint_input.text_input(
 # ── Slide defaults ─────────────────────────────────────────────────────────
 if st.session_state.setup_slides_loaded:
     st.markdown("**Slides — Set Defaults**")
-    st.caption("Toggle off slides that should be hidden by default.")
+    st.caption("Toggle off slides that should be excluded by default. Keep enabled the slides that appear in every generation.")
     for slide in st.session_state.setup_slides_loaded:
         num = slide["number"]
         default_val = st.session_state.setup_slide_defaults.get(num, True)
@@ -157,17 +162,25 @@ if st.button("Save Template", type="primary"):
         if new_t.id not in {t.id for t in templates}:
             updated.append(new_t)
         save_templates(updated, REGISTRY_PATH)
-        st.markdown(
+
+        # Show success banner at top
+        success_banner.markdown(
             f'<div style="background:#ECFDF5;border:1.5px solid #059669;padding:1rem;'
             f'border-radius:4px;margin-bottom:1rem">'
             f'<div style="display:flex;align-items:center;gap:8px">'
             f'<span style="font-size:20px;color:#059669">✓</span>'
-            f'<span style="color:#059669;font-weight:600">Ok</span>'
+            f'<span style="color:#059669;font-weight:600">Template Saved!</span>'
             f'</div></div>',
             unsafe_allow_html=True,
         )
+
         # Reset form state
         st.session_state.setup_editing_id = None
         st.session_state.setup_slides_loaded = []
         st.session_state.setup_slide_defaults = {}
+
+        # Clear banner after 2 seconds
+        import time
+        time.sleep(2)
+        success_banner.empty()
         st.rerun()
