@@ -32,6 +32,14 @@ if "setup_editing_id" not in st.session_state:
     st.session_state.setup_editing_id = None  # template id being edited, or None for new
 if "show_success_banner" not in st.session_state:
     st.session_state.show_success_banner = False
+if "template_name_input" not in st.session_state:
+    st.session_state.template_name_input = ""
+if "slides_url_input" not in st.session_state:
+    st.session_state.slides_url_input = ""
+if "var_label_input" not in st.session_state:
+    st.session_state.var_label_input = ""
+if "var_hint_input" not in st.session_state:
+    st.session_state.var_hint_input = ""
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────
@@ -91,11 +99,22 @@ if templates:
 # ── Form: create or edit ───────────────────────────────────────────────────
 editing = get_template_by_id(templates, st.session_state.setup_editing_id) if st.session_state.setup_editing_id else None
 form_title = f"Edit: {editing.name}" if editing else "New Template"
-st.markdown(f'<div class="section-label">{form_title}</div>', unsafe_allow_html=True)
+
+col_title, col_new = st.columns([5, 1])
+with col_title:
+    st.markdown(f'<div class="section-label">{form_title}</div>', unsafe_allow_html=True)
+if editing and col_new.button("New →", use_container_width=True):
+    st.session_state.setup_editing_id = None
+    st.session_state.setup_slides_loaded = []
+    st.session_state.setup_slide_defaults = {}
+    st.session_state.template_name_input = ""
+    st.session_state.slides_url_input = ""
+    st.session_state.var_label_input = ""
+    st.session_state.var_hint_input = ""
+    st.rerun()
 
 template_name = st.text_input(
     label="Template Name",
-    value=editing.name if editing else "",
     placeholder="e.g. Industry Targeted Comparison",
     key="template_name_input",
 )
@@ -106,7 +125,6 @@ col_slides, col_btn = st.columns([5.5, 1.2])
 with col_slides:
     slides_url = st.text_input(
         label="Google Slides Template",
-        value=editing.slides_id if editing else "",
         placeholder="Paste Google Slides URL or ID",
         key="slides_url_input",
     )
@@ -133,14 +151,12 @@ col_lbl, col_hint_input = st.columns(2)
 with col_lbl:
     variable_label = st.text_input(
         label="Label shown to users",
-        value=editing.variable_label if editing else "",
         placeholder="e.g. Competitor Name",
         key="var_label_input",
     )
 with col_hint_input:
     variable_hint = st.text_input(
         label="Placeholder hint",
-        value=editing.variable_hint if editing else "",
         placeholder="e.g. Sauce Labs",
         key="var_hint_input",
     )
@@ -212,6 +228,10 @@ with col_save:
             st.session_state.setup_editing_id = None
             st.session_state.setup_slides_loaded = []
             st.session_state.setup_slide_defaults = {}
+            st.session_state.template_name_input = ""
+            st.session_state.slides_url_input = ""
+            st.session_state.var_label_input = ""
+            st.session_state.var_hint_input = ""
 
             # Clear banner after 2 seconds
             import time
