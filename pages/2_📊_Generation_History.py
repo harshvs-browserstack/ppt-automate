@@ -6,8 +6,15 @@ import streamlit as st
 from core.config import get_config
 from core.auth_helpers import get_sheets_service
 import pandas as pd
+import pathlib
 
 st.set_page_config(page_title="Generation History", layout="wide")
+
+# Load CSS for dark mode support
+css_path = pathlib.Path(__file__).parent.parent / "styles.css"
+if css_path.exists():
+    with open(css_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 config = get_config()
 
