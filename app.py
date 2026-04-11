@@ -99,7 +99,7 @@ if st.session_state.app_state == "input":
                 unsafe_allow_html=True,
             )
             if st.button("Browse templates →", key="btn_custom", use_container_width=True):
-                # Just scroll focus to template row — no action needed, it's always visible
+                st.session_state.suggest_mode = False
                 st.rerun()
 
         st.markdown("<br>", unsafe_allow_html=True)
