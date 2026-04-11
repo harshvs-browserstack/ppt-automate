@@ -18,6 +18,7 @@ if css_path.exists():
 from core.config import get_config
 from core.template_registry import load_templates, get_template_by_id, get_excluded_slide_numbers, REGISTRY_PATH
 from core.suggest_template import suggest_template
+from core.cache import invalidate_history_cache
 
 config = get_config()
 
@@ -297,6 +298,7 @@ elif st.session_state.app_state == "loading":
 
         st.session_state.final_url = final_url
         st.session_state.app_state = "success"
+        invalidate_history_cache()  # Clear history cache so next view gets fresh data
         st.rerun()
 
     except Exception as e:
