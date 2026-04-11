@@ -27,6 +27,7 @@ class Config:
     original_slides_id: str = ""
     power_user_mode: bool = False
     google_service_account_email: str = ""
+    history_sheet_id: str = ""  # Optional: Google Sheet to log all generations
 
 
 def get_config() -> Config:
@@ -70,4 +71,5 @@ def get_config() -> Config:
         original_slides_id=os.getenv("ORIGINAL_SLIDES_ID", ""),
         power_user_mode=os.getenv("POWER_USER_MODE", "").lower() == "true",
         google_service_account_email=os.getenv("GOOGLE_SERVICE_ACCOUNT_EMAIL", ""),
+        history_sheet_id=os.getenv("HISTORY_SHEET_ID", ""),
     )

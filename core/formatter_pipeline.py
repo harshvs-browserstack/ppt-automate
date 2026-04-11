@@ -14,6 +14,7 @@ from tqdm import tqdm
 from core.auth_helpers import get_drive_service, get_sheets_service
 from core.config import Config
 from core.prompt_templates import create_slide_generation_prompt
+from core.history import log_generation
 
 
 def contains_url(text: str) -> bool:
@@ -476,6 +477,20 @@ async def run_ai_content_population(
                 on_status("Complete!", 1.0)
             print(f"\n✓ Pipeline complete!")
             print(f"   -> Final URL: {final_url}")
+
+            # Log generation to history sheet
+            try:
+                if config.history_sheet_id:
+                    log_generation(
+                        config.gdrive_credentials_path,
+                        config.history_sheet_id,
+                        final_url,
+                        template_name=None,
+                        target_value=competitor,
+                        pdf_filename=pdf_filename,
+                    )
+            except Exception as e:
+                print(f"   -> Warning: Could not log generation: {e}")
 
             return final_url
 
