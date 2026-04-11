@@ -46,9 +46,9 @@ templates = load_templates(REGISTRY_PATH)
 if templates:
     st.subheader("Existing Templates")
     for t in templates:
-        col1, col2 = st.columns([5, 1])
+        col1, col_edit, col_delete = st.columns([4, 0.8, 0.8])
         col1.write(f"**{t.name}** — {t.variable_label}")
-        if col2.button("Edit", key=f"edit_{t.id}"):
+        if col_edit.button("Edit", key=f"edit_{t.id}"):
             st.session_state.setup_editing_id = t.id
             # Pre-populate slides from saved defaults
             st.session_state.setup_slides_loaded = [
@@ -57,6 +57,11 @@ if templates:
             st.session_state.setup_slide_defaults = {
                 s.number: s.enabled for s in t.slides
             }
+            st.rerun()
+        if col_delete.button("Delete", key=f"delete_{t.id}"):
+            # Remove template and save
+            updated = [x for x in templates if x.id != t.id]
+            save_templates(updated, REGISTRY_PATH)
             st.rerun()
 
 st.divider()
@@ -152,7 +157,15 @@ if st.button("Save Template", type="primary"):
         if new_t.id not in {t.id for t in templates}:
             updated.append(new_t)
         save_templates(updated, REGISTRY_PATH)
-        st.success(f"Template '{new_t.name}' saved.")
+        st.markdown(
+            f'<div style="background:#ECFDF5;border:1.5px solid #059669;padding:1rem;'
+            f'border-radius:4px;margin-bottom:1rem">'
+            f'<div style="display:flex;align-items:center;gap:8px">'
+            f'<span style="font-size:20px;color:#059669">✓</span>'
+            f'<span style="color:#059669;font-weight:600">Ok</span>'
+            f'</div></div>',
+            unsafe_allow_html=True,
+        )
         # Reset form state
         st.session_state.setup_editing_id = None
         st.session_state.setup_slides_loaded = []
