@@ -7,7 +7,7 @@ import streamlit as st
 st.set_page_config(
     page_title="Document to Deck",
     page_icon="✨",
-    layout="centered",
+    layout="wide",
 )
 
 css_path = pathlib.Path(__file__).parent / "styles.css"

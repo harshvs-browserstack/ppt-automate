@@ -10,14 +10,14 @@
    1. HIDE STREAMLIT CHROME
    ============================================================================ */
 
-/* Hide the Streamlit hamburger menu */
+/* Show the Streamlit hamburger menu and header */
 button[kind="header"] {
-  display: none !important;
+  display: block !important;
 }
 
-/* Hide the main header */
+/* Show the main header */
 [data-testid="stHeader"] {
-  display: none !important;
+  display: block !important;
 }
 
 /* Hide the footer */
@@ -74,6 +74,7 @@ footer {
 }
 
 /* Dark mode overrides */
+/* Streamlit's dark mode is detected when the main background is dark */
 @media (prefers-color-scheme: dark) {
   :root {
     --primary: #A78BFA;
@@ -81,10 +82,23 @@ footer {
     --surface: #1E293B;
     --text: #F1F5F9;
     --muted: #94A3B8;
-    --accent: #10B981;
+    --accent: #C4B5FD;
     --border: #334155;
     --shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
   }
+}
+
+/* Force light mode variables when the background is light (Streamlit light theme) */
+.main > .block-container {
+  /* When background is light, ensure light mode variables are active */
+  --primary: #1E1B4B;
+  --background: #F9FAFB;
+  --surface: #FFFFFF;
+  --text: #111827;
+  --muted: #6B7280;
+  --accent: #059669;
+  --border: #E5E7EB;
+  --shadow: 0 20px 40px -10px rgba(30, 27, 75, 0.05);
 }
 
 /* ============================================================================
@@ -667,7 +681,7 @@ tbody tr:hover {
 
 /* Section label */
 .section-label {
-  font-family: var(--sans-font);
+  font-family: var(--serif-font);
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;

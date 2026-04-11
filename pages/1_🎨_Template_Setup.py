@@ -13,7 +13,7 @@ from core.slides_helpers import fetch_slide_titles
 import re
 import pathlib
 
-st.set_page_config(page_title="Template Setup", layout="centered")
+st.set_page_config(page_title="Template Setup", layout="wide")
 
 # Load CSS for dark mode support
 css_path = pathlib.Path(__file__).parent.parent / "styles.css"
