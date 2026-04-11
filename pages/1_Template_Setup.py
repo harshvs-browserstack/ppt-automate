@@ -10,7 +10,6 @@ from core.template_registry import (
     get_template_by_id, new_template_id, REGISTRY_PATH,
 )
 from core.slides_helpers import fetch_slide_titles
-from core.auth_helpers import get_credentials
 import re
 
 st.set_page_config(page_title="Template Setup", layout="centered")
@@ -41,14 +40,14 @@ def _extract_slides_id(value: str) -> str:
 st.title("Template Setup")
 st.caption("Create and manage presentation templates.")
 
-templates = load_templates()
+templates = load_templates(REGISTRY_PATH)
 
 # ── Existing templates list ────────────────────────────────────────────────
 if templates:
     st.subheader("Existing Templates")
     for t in templates:
         col1, col2 = st.columns([5, 1])
-        col1.markdown(f"**{t.name}** — `{t.variable_label}`")
+        col1.write(f"**{t.name}** — {t.variable_label}")
         if col2.button("Edit", key=f"edit_{t.id}"):
             st.session_state.setup_editing_id = t.id
             # Pre-populate slides from saved defaults
@@ -128,6 +127,8 @@ if st.button("Save Template", type="primary"):
         st.error("Google Slides URL or ID is required.")
     elif not variable_label.strip():
         st.error("Variable label is required.")
+    elif not st.session_state.setup_slides_loaded:
+        st.error("Please load slides before saving.")
     else:
         slides_id = _extract_slides_id(slides_url.strip())
         slide_defaults = [
@@ -150,7 +151,7 @@ if st.button("Save Template", type="primary"):
         updated = [new_t if t.id == new_t.id else t for t in templates]
         if new_t.id not in {t.id for t in templates}:
             updated.append(new_t)
-        save_templates(updated)
+        save_templates(updated, REGISTRY_PATH)
         st.success(f"Template '{new_t.name}' saved.")
         # Reset form state
         st.session_state.setup_editing_id = None
