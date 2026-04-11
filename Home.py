@@ -128,8 +128,7 @@ if st.session_state.app_state == "input":
         st.markdown('<div class="suggest-panel">', unsafe_allow_html=True)
         st.markdown('<div class="section-label">What do you need?</div>', unsafe_allow_html=True)
         description = st.text_area(
-            label="description",
-            label_visibility="collapsed",
+            label="",
             placeholder="e.g. I need a deck comparing BrowserStack to Sauce Labs for an enterprise fintech prospect...",
             height=80,
             key="suggest_description",
@@ -219,8 +218,7 @@ if st.session_state.app_state == "input":
             st.markdown(f'<div class="section-label">{label_text}</div>', unsafe_allow_html=True)
 
         target = st.text_input(
-            label=label_text,
-            label_visibility="collapsed",
+            label="",
             value=st.session_state.target,
             placeholder=selected_template.variable_hint,
             key="target_input",
@@ -232,8 +230,7 @@ if st.session_state.app_state == "input":
         # ── PDF Upload ─────────────────────────────────────────────────────
         st.markdown('<div class="section-label">Research PDF</div>', unsafe_allow_html=True)
         uploaded_file = st.file_uploader(
-            label="PDF",
-            label_visibility="collapsed",
+            label="",
             type=["pdf"],
         )
 
