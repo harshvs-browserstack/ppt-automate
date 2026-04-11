@@ -35,8 +35,12 @@ def _extract_slides_id(value: str) -> str:
 
 
 # ── Page ───────────────────────────────────────────────────────────────────
-st.title("Template Setup")
+st.markdown(
+    '<h1 style="font-family:\'Newsreader\',serif;font-size:2.25rem;margin-bottom:0.25rem">Editorial Template Setup</h1>',
+    unsafe_allow_html=True,
+)
 st.caption("Create and manage presentation templates.")
+st.markdown("<br>", unsafe_allow_html=True)
 
 # Success banner placeholder (shown at top when template is saved)
 success_banner = st.empty()
@@ -45,10 +49,18 @@ templates = load_templates(REGISTRY_PATH)
 
 # ── Existing templates list ────────────────────────────────────────────────
 if templates:
-    st.subheader("Existing Templates")
+    st.markdown('<div class="section-label">Existing Templates</div>', unsafe_allow_html=True)
     for t in templates:
         col1, col_edit, col_delete = st.columns([4, 0.8, 0.8])
-        col1.write(f"**{t.name}** — {t.variable_label}")
+        col1.markdown(
+            f'<div style="padding:0.75rem;border:1px solid;border-color:#E5E7EB;'
+            f'@media(prefers-color-scheme:dark){{border-color:#334155;}}">'
+            f'<div style="font-weight:600;margin-bottom:0.25rem">{t.name}</div>'
+            f'<div style="font-size:0.875rem;color:#6B7280;'
+            f'@media(prefers-color-scheme:dark){{color:#94A3B8;}}">{t.variable_label}</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
         if col_edit.button("Edit", key=f"edit_{t.id}"):
             st.session_state.setup_editing_id = t.id
             # Pre-populate slides from saved defaults
@@ -64,29 +76,31 @@ if templates:
             updated = [x for x in templates if x.id != t.id]
             save_templates(updated, REGISTRY_PATH)
             st.rerun()
-
-st.divider()
+    st.divider()
+else:
+    st.markdown("<br>", unsafe_allow_html=True)
 
 # ── Form: create or edit ───────────────────────────────────────────────────
 editing = get_template_by_id(templates, st.session_state.setup_editing_id) if st.session_state.setup_editing_id else None
 form_title = f"Edit: {editing.name}" if editing else "New Template"
-st.subheader(form_title)
+st.markdown(f'<div class="section-label">{form_title}</div>', unsafe_allow_html=True)
 
 template_name = st.text_input(
-    "Template Name",
+    label="Template Name",
     value=editing.name if editing else "",
     placeholder="e.g. Industry Targeted Comparison",
 )
 
-slides_url = st.text_input(
-    "Google Slides Template",
+st.markdown('<div style="height:0.5rem"></div>', unsafe_allow_html=True)
+
+col_slides, col_btn = st.columns([4, 1])
+slides_url = col_slides.text_input(
+    label="Google Slides Template",
     value=editing.slides_id if editing else "",
     placeholder="Paste Google Slides URL or ID",
 )
-
-col_load, col_hint = st.columns([2, 5])
-load_clicked = col_load.button("Load Slides →")
-col_hint.caption("Fetches slide structure from your template deck.")
+load_clicked = col_btn.button("Load Slides →", use_container_width=True)
+st.caption("Fetches slide structure from your template deck.")
 
 if load_clicked and slides_url.strip():
     slides_id = _extract_slides_id(slides_url.strip())
@@ -99,14 +113,16 @@ if load_clicked and slides_url.strip():
         except Exception as e:
             st.error(f"Could not load slides: {e}")
 
+st.markdown('<div style="height:1rem"></div>', unsafe_allow_html=True)
+
 col_lbl, col_hint_input = st.columns(2)
 variable_label = col_lbl.text_input(
-    "Label shown to users",
+    label="Label shown to users",
     value=editing.variable_label if editing else "",
     placeholder="e.g. Competitor Name",
 )
 variable_hint = col_hint_input.text_input(
-    "Placeholder hint",
+    label="Placeholder hint",
     value=editing.variable_hint if editing else "",
     placeholder="e.g. Sauce Labs",
 )
@@ -161,11 +177,11 @@ if st.button("Save Template", type="primary"):
 
         # Show success banner at top
         success_banner.markdown(
-            f'<div style="background:#ECFDF5;border:1.5px solid #059669;padding:1rem;'
-            f'border-radius:4px;margin-bottom:1rem">'
+            f'<div style="background:rgba(16,185,129,0.1);border:1.5px solid #10B981;padding:1rem;'
+            f'border-radius:0;margin-bottom:1rem">'
             f'<div style="display:flex;align-items:center;gap:8px">'
-            f'<span style="font-size:20px;color:#059669">✓</span>'
-            f'<span style="color:#059669;font-weight:600">Template Saved!</span>'
+            f'<span style="font-size:20px;color:#10B981">✓</span>'
+            f'<span style="color:#10B981;font-weight:600">Template Saved!</span>'
             f'</div></div>',
             unsafe_allow_html=True,
         )

@@ -11,7 +11,10 @@ st.set_page_config(page_title="Generation History", layout="wide")
 
 config = get_config()
 
-st.title("📊 Generation History")
+st.markdown(
+    '<h1 style="font-family:\'Newsreader\',serif;font-size:2.25rem;margin-bottom:0.25rem">📊 Generation History</h1>',
+    unsafe_allow_html=True,
+)
 st.caption("All slide generations logged here for audit trail and reference.")
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -44,15 +47,19 @@ try:
 
     # Display summary stats
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Generations", len(df))
-    col2.metric("Unique Templates", df["Template"].nunique() if "Template" in df.columns else 0)
-    col3.metric("Unique Targets", df["Target Value"].nunique() if "Target Value" in df.columns else 0)
-    col4.metric("Latest Generation", df["Timestamp"].iloc[-1] if len(df) > 0 else "—")
+    with col1:
+        st.metric("Total Generations", len(df))
+    with col2:
+        st.metric("Unique Templates", df["Template"].nunique() if "Template" in df.columns else 0)
+    with col3:
+        st.metric("Unique Targets", df["Target Value"].nunique() if "Target Value" in df.columns else 0)
+    with col4:
+        st.metric("Latest Generation", df["Timestamp"].iloc[-1] if len(df) > 0 else "—")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Display full history table with clickable links
-    st.subheader("All Generations")
+    st.markdown('<div class="section-label">All Generations</div>', unsafe_allow_html=True)
 
     # Make Slide URL clickable
     if "Slide URL" in df.columns:
@@ -81,7 +88,7 @@ try:
 
     # Export option
     st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("Export")
+    st.markdown('<div class="section-label">Export</div>', unsafe_allow_html=True)
 
     csv = df.to_csv(index=False)
     st.download_button(
