@@ -542,5 +542,78 @@ tbody tr:hover {
 }
 
 /* ============================================================================
+   26. TEMPLATE TILES & BANNER CARDS
+   ============================================================================ */
+
+/* Banner card — used for Quick Generate / Custom Build entry points */
+.banner-card {
+  padding: 1rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.banner-card:hover { opacity: 0.9; }
+.banner-card-primary {
+  background-color: var(--primary);
+  color: white;
+}
+.banner-card-outline {
+  background-color: var(--surface);
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+}
+
+/* Suggest panel — inline AI suggestion area */
+.suggest-panel {
+  background-color: rgba(30, 27, 75, 0.03);
+  border: 1.5px solid var(--primary);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Suggestion result card */
+.suggestion-card {
+  background-color: rgba(5, 150, 105, 0.05);
+  border: 1.5px solid var(--accent);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Auto-filled badge */
+.auto-filled-badge {
+  display: inline-block;
+  background-color: rgba(5, 150, 105, 0.1);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Active template status bar */
+.template-status-bar {
+  background-color: var(--primary);
+  color: white;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Section label */
+.section-label {
+  font-family: var(--sans-font);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+/* ============================================================================
    END OF STITCH EDITORIAL DESIGN SYSTEM CSS
    ============================================================================ */
