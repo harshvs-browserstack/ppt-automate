@@ -182,7 +182,7 @@ if st.session_state.app_state == "input":
     col_row_label, col_add = st.columns([5, 1])
     if config.power_user_mode:
         if col_add.button("+ Add", key="btn_add_template"):
-            st.switch_page("pages/1_Template_Setup.py")
+            st.switch_page("pages/1_🎨_Template_Setup.py")
 
     if not templates:
         st.info("No templates yet. Add one with + Add Template." if config.power_user_mode
