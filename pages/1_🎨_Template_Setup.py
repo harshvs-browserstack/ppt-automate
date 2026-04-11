@@ -16,10 +16,6 @@ st.set_page_config(page_title="Template Setup", layout="centered")
 
 config = get_config()
 
-if not config.power_user_mode:
-    st.error("Template setup requires POWER_USER_MODE=true.")
-    st.stop()
-
 # ── Session state ──────────────────────────────────────────────────────────
 if "setup_slides_loaded" not in st.session_state:
     st.session_state.setup_slides_loaded = []  # list of {"number": int, "title": str}

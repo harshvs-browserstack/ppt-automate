@@ -179,13 +179,11 @@ if st.session_state.app_state == "input":
     st.markdown('<div class="section-label">Template</div>', unsafe_allow_html=True)
 
     col_row_label, col_add = st.columns([5, 1])
-    if config.power_user_mode:
-        if col_add.button("+ Add", key="btn_add_template"):
-            st.switch_page("pages/1_🎨_Template_Setup.py")
+    if col_add.button("+ Add", key="btn_add_template"):
+        st.switch_page("pages/1_🎨_Template_Setup.py")
 
     if not templates:
-        st.info("No templates yet. Add one with + Add Template." if config.power_user_mode
-                else "No templates available. Contact your template manager.")
+        st.info("No templates yet. Add one with + Add Template.")
     else:
         suggest_cols = st.columns(min(len(templates) + 1, 5))
         # Suggest button first
