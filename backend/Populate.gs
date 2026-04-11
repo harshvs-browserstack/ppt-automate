@@ -63,9 +63,7 @@ function populateTemplateFromSheet() {
     }
   }
 
-  // Log generation to history sheet
-  logGeneration_(presentationUrl, null, null, null);
-
+  // Note: History logging is now handled by Python backend for complete data capture
   return presentationUrl;
 }
 
