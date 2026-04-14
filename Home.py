@@ -134,6 +134,12 @@ if st.session_state.app_state == "input":
             height=80,
             key="suggest_description",
         )
+        st.markdown('<div class="section-label">Research PDF</div>', unsafe_allow_html=True)
+        suggest_pdf = st.file_uploader(
+            label="",
+            type=["pdf"],
+            key="suggest_pdf_upload",
+        )
         col_suggest_btn, col_cancel = st.columns([2, 1])
         suggest_clicked = col_suggest_btn.button("Suggest →", key="btn_suggest", type="primary")
         if col_cancel.button("Cancel", key="btn_cancel_suggest"):
@@ -141,16 +147,25 @@ if st.session_state.app_state == "input":
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-        if suggest_clicked and description.strip() and templates:
-            with st.spinner("Finding the right template..."):
-                result = suggest_template(
-                    description=description.strip(),
-                    templates=templates,
-                    api_key=config.gemini_api_key,
-                    model_id=config.model_id,
-                )
-            st.session_state.suggest_result = result
-            st.rerun()
+        if suggest_clicked:
+            if not description.strip():
+                st.error("Please describe what you need.")
+            elif not suggest_pdf:
+                st.error("Please upload a PDF.")
+            elif templates:
+                # Store PDF now so it's ready for generation
+                st.session_state.pdf_bytes = suggest_pdf.read()
+                st.session_state.pdf_filename = suggest_pdf.name
+                st.caption("Usually takes 5–10 seconds")
+                with st.spinner("Finding the right template..."):
+                    result = suggest_template(
+                        description=description.strip(),
+                        templates=templates,
+                        api_key=config.gemini_api_key,
+                        model_id=config.model_id,
+                    )
+                st.session_state.suggest_result = result
+                st.rerun()
 
         # Show suggestion result card
         if st.session_state.suggest_result:
