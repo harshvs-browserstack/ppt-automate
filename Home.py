@@ -64,137 +64,104 @@ if st.session_state.app_state == "input":
         'color:#A78BFA;margin-bottom:0.25rem">Turn Research Into a Deck</h1>',
         unsafe_allow_html=True,
     )
-    st.caption("Upload your PDF, pick a template, and let AI do the rest.")
+    st.caption("Pick a template below, upload your PDF, and let AI do the rest.")
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ── Entry banners (Quick Generate / Custom Build) ──────────────────────
-    if not selected_template:
-        col_quick, col_custom = st.columns(2)
-
-        with col_quick:
-            st.markdown(
-                '<div class="banner-card banner-card-primary">'
-                '<div style="font-size:0.65rem;opacity:0.7;text-transform:uppercase;'
-                'letter-spacing:0.08em;margin-bottom:4px">⚡ Quick Generate</div>'
-                '<div style="font-size:0.9rem;font-weight:600;margin-bottom:4px">'
-                'Describe your goal, AI handles the rest</div>'
-                '<div style="font-size:0.75rem;opacity:0.75">'
-                'AI suggests the right template and fills the details.</div>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-            if st.button("Click to start →", key="btn_quick", use_container_width=True):
-                st.session_state.suggest_mode = True
-                st.rerun()
-
-        with col_custom:
-            st.markdown(
-                '<div class="banner-card banner-card-outline">'
-                '<div style="font-size:0.65rem;opacity:0.6;text-transform:uppercase;'
-                'letter-spacing:0.08em;margin-bottom:4px">🎛 Custom Build</div>'
-                '<div style="font-size:0.9rem;font-weight:600;margin-bottom:4px">'
-                'Pick a template, set your target, upload</div>'
-                '<div style="font-size:0.75rem;opacity:0.65">'
-                'Select from the library and configure before generating.</div>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-            if st.button("Browse templates →", key="btn_custom", use_container_width=True):
+    if selected_template:
+        # Breadcrumb: "← All templates  ›  Template Name"
+        col_back, col_crumb = st.columns([1.2, 8])
+        with col_back:
+            st.markdown('<div class="btn-link">', unsafe_allow_html=True)
+            if st.button("← All templates", key="btn_change"):
+                st.session_state.selected_template_id = None
                 st.session_state.suggest_mode = False
+                st.session_state.suggest_result = None
+                st.session_state.auto_filled_target = False
                 st.rerun()
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-    else:
-        # Slim status bar after template is selected
-        path_label = "⚡ Quick Generate" if st.session_state.suggest_result else "🎛 Custom Build"
-        col_bar, col_change = st.columns([5, 1])
-        col_bar.markdown(
-            f'<div class="template-status-bar">'
-            f'<span style="opacity:0.7;font-size:0.7rem">{path_label}</span>'
-            f'<span>·</span>'
-            f'<span><strong>{selected_template.name}</strong></span>'
+            st.markdown('</div>', unsafe_allow_html=True)
+        col_crumb.markdown(
+            f'<div class="breadcrumb">'
+            f'<span class="breadcrumb-sep">›</span>'
+            f'<span class="breadcrumb-current">{selected_template.name}</span>'
             f'</div>',
             unsafe_allow_html=True,
         )
-        if col_change.button("Change", key="btn_change"):
-            st.session_state.selected_template_id = None
-            st.session_state.suggest_mode = False
-            st.session_state.suggest_result = None
-            st.session_state.auto_filled_target = False
-            st.rerun()
 
-    # ── Suggest Template inline flow ───────────────────────────────────────
-    if st.session_state.suggest_mode and not selected_template:
-        st.markdown('<div class="suggest-panel">', unsafe_allow_html=True)
-        st.markdown('<div class="section-label">What do you need?</div>', unsafe_allow_html=True)
-        description = st.text_area(
-            label="",
-            placeholder="e.g. I need a deck comparing BrowserStack to Sauce Labs for an enterprise fintech prospect...",
-            height=80,
-            key="suggest_description",
-        )
-        col_suggest_btn, col_cancel = st.columns([2, 1])
-        suggest_clicked = col_suggest_btn.button("Suggest →", key="btn_suggest", type="primary")
-        if col_cancel.button("Cancel", key="btn_cancel_suggest"):
-            st.session_state.suggest_mode = False
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        if suggest_clicked and description.strip() and templates:
-            with st.spinner("Finding the right template..."):
-                result = suggest_template(
-                    description=description.strip(),
-                    templates=templates,
-                    api_key=config.gemini_api_key,
-                    model_id=config.model_id,
-                )
-            st.session_state.suggest_result = result
-            st.rerun()
-
-        # Show suggestion result card
-        if st.session_state.suggest_result:
-            r = st.session_state.suggest_result
-            suggested_t = get_template_by_id(templates, r.template_id)
-            if suggested_t:
-                st.markdown(
-                    f'<div class="suggestion-card">'
-                    f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-                    f'<span style="background:#059669;color:#fff;font-size:0.65rem;font-weight:700;'
-                    f'padding:2px 8px">✦ Suggested</span>'
-                    f'<strong style="color:#111827">{suggested_t.name}</strong>'
-                    f'</div>'
-                    f'<p style="font-size:0.8rem;color:#6B7280;margin-bottom:0">{r.reason}</p>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-                col_use, col_pick = st.columns([3, 1])
-                if col_use.button(f"Use {suggested_t.name} →", key="btn_use_suggestion", type="primary", use_container_width=True):
-                    _select_template(r.template_id, r.extracted_target)
-                    st.rerun()
-                if col_pick.button("Pick another", key="btn_pick_another", use_container_width=True):
-                    st.session_state.suggest_result = None
-                    st.rerun()
+    # ── Suggest Template inline flow (disabled) ────────────────────────────
+    # if st.session_state.suggest_mode and not selected_template:
+    #     st.markdown('<div class="suggest-panel">', unsafe_allow_html=True)
+    #     st.markdown('<div class="section-label">What do you need?</div>', unsafe_allow_html=True)
+    #     description = st.text_area(
+    #         label="",
+    #         placeholder="e.g. I need a deck comparing BrowserStack to Sauce Labs for an enterprise fintech prospect...",
+    #         height=80,
+    #         key="suggest_description",
+    #     )
+    #     col_suggest_btn, col_cancel = st.columns([2, 1])
+    #     suggest_clicked = col_suggest_btn.button("Suggest →", key="btn_suggest", type="primary")
+    #     if col_cancel.button("Cancel", key="btn_cancel_suggest"):
+    #         st.session_state.suggest_mode = False
+    #         st.rerun()
+    #     st.markdown("</div>", unsafe_allow_html=True)
+    #
+    #     if suggest_clicked and description.strip() and templates:
+    #         with st.spinner("Finding the right template..."):
+    #             result = suggest_template(
+    #                 description=description.strip(),
+    #                 templates=templates,
+    #                 api_key=config.gemini_api_key,
+    #                 model_id=config.model_id,
+    #             )
+    #         st.session_state.suggest_result = result
+    #         st.rerun()
+    #
+    #     # Show suggestion result card
+    #     if st.session_state.suggest_result:
+    #         r = st.session_state.suggest_result
+    #         suggested_t = get_template_by_id(templates, r.template_id)
+    #         if suggested_t:
+    #             st.markdown(
+    #                 f'<div class="suggestion-card">'
+    #                 f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    #                 f'<span style="background:#059669;color:#fff;font-size:0.65rem;font-weight:700;'
+    #                 f'padding:2px 8px">✦ Suggested</span>'
+    #                 f'<strong style="color:#111827">{suggested_t.name}</strong>'
+    #                 f'</div>'
+    #                 f'<p style="font-size:0.8rem;color:#6B7280;margin-bottom:0">{r.reason}</p>'
+    #                 f'</div>',
+    #                 unsafe_allow_html=True,
+    #             )
+    #             col_use, col_pick = st.columns([3, 1])
+    #             if col_use.button(f"Use {suggested_t.name} →", key="btn_use_suggestion", type="primary", use_container_width=True):
+    #                 _select_template(r.template_id, r.extracted_target)
+    #                 st.rerun()
+    #             if col_pick.button("Pick another", key="btn_pick_another", use_container_width=True):
+    #                 st.session_state.suggest_result = None
+    #                 st.rerun()
 
     # ── Template row ───────────────────────────────────────────────────────
-    st.markdown('<div class="section-label">Template</div>', unsafe_allow_html=True)
-
-    col_row_label, col_add = st.columns([5, 1])
+    col_template_label, col_add = st.columns([5, 1])
+    col_template_label.markdown(
+        '<div class="section-label">'
+        + ("Step 1 — Pick a template" if not selected_template else "Template")
+        + '</div>',
+        unsafe_allow_html=True,
+    )
     if col_add.button("+ Add", key="btn_add_template"):
         st.switch_page("pages/1_🎨_Template_Setup.py")
 
     if not templates:
-        st.info("No templates yet. Add one with + Add Template.")
+        st.info("No templates yet. Click + Add to create one.")
     else:
-        suggest_cols = st.columns(min(len(templates) + 1, 5))
-        # Suggest button first
-        if suggest_cols[0].button("✦ Suggest", key="btn_suggest_row",
-                                   type="primary" if not st.session_state.suggest_mode else "secondary"):
-            st.session_state.suggest_mode = True
-            st.rerun()
+        suggest_cols = st.columns(min(len(templates), 5))
+        # # ── Suggest button disabled ────────────────────────────────────────
+        # if suggest_cols[0].button("✦ Suggest", key="btn_suggest_row",
+        #                            type="primary" if not st.session_state.suggest_mode else "secondary"):
+        #     st.session_state.suggest_mode = True
+        #     st.rerun()
         # Template tiles
         for i, t in enumerate(templates):
-            col = suggest_cols[i + 1] if i + 1 < len(suggest_cols) else suggest_cols[-1]
+            col = suggest_cols[i] if i < len(suggest_cols) else suggest_cols[-1]
             is_selected = st.session_state.selected_template_id == t.id
             btn_type = "primary" if is_selected else "secondary"
             label = f"✓ {t.name}" if is_selected else t.name
