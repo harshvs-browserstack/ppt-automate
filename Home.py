@@ -249,10 +249,10 @@ elif st.session_state.app_state == "loading":
 
         final_url = asyncio.run(
             run_ai_content_population(
-                pdf_bytes=st.session_state.pdf_bytes,
-                pdf_filename=st.session_state.pdf_filename,
                 competitor=st.session_state.target,
                 config=config,
+                pdf_bytes=st.session_state.pdf_bytes,
+                pdf_filename=st.session_state.pdf_filename,
                 slides_id=slides_id,
                 excluded_slide_numbers=excluded,
                 template_name=selected_template.name if selected_template else None,
