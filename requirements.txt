@@ -13,3 +13,4 @@ tqdm>=4.66.4
 pytest>=8.2.0
 pytest-asyncio>=0.23.0
 tabulate
+beautifulsoup4>=4.12.0

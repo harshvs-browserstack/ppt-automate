@@ -90,3 +90,84 @@ def test_save_overwrites_on_id_collision(tmp_path):
     loaded = load_templates(str(reg))
     assert len(loaded) == 1
     assert loaded[0].name == "New Name"
+
+
+# --- TemplateDNA and new Template fields ---
+
+from core.template_registry import TemplateDNA
+
+
+def _base_template() -> Template:
+    return Template(
+        id="abc123",
+        name="Test Template",
+        slides_id="slides_id",
+        variable_label="Competitor",
+        variable_hint="Acme",
+        slides=[SlideDefault(number=1, title="Intro", enabled=True)],
+    )
+
+
+def test_template_dna_stored_on_template():
+    dna = TemplateDNA(
+        purpose="A competitive battlecard",
+        dimensions=["market positioning", "pricing"],
+        tone="professional",
+        source_guidance="competitor research",
+    )
+    t = _base_template()
+    t.template_dna = dna
+    assert t.template_dna.purpose == "A competitive battlecard"
+    assert len(t.template_dna.dimensions) == 2
+
+
+def test_new_template_fields_default():
+    t = _base_template()
+    assert t.template_dna is None
+    assert t.confluence_spaces == []
+    assert t.search_labels == []
+    assert t.research_drive_folder_id == ""
+
+
+def test_save_and_load_preserves_new_fields(tmp_path):
+    registry = tmp_path / "templates.json"
+    dna = TemplateDNA(
+        purpose="Test purpose",
+        dimensions=["dim1", "dim2"],
+        tone="formal",
+        source_guidance="docs",
+    )
+    t = _base_template()
+    t.template_dna = dna
+    t.confluence_spaces = ["CI", "PROD"]
+    t.search_labels = ["battlecard"]
+    t.research_drive_folder_id = "folder123"
+
+    save_templates([t], str(registry))
+    loaded = load_templates(str(registry))
+
+    assert loaded[0].confluence_spaces == ["CI", "PROD"]
+    assert loaded[0].search_labels == ["battlecard"]
+    assert loaded[0].research_drive_folder_id == "folder123"
+    assert loaded[0].template_dna is not None
+    assert loaded[0].template_dna.purpose == "Test purpose"
+    assert loaded[0].template_dna.dimensions == ["dim1", "dim2"]
+
+
+def test_load_templates_backward_compat_without_new_fields(tmp_path):
+    """Existing templates.json without new fields must load without error."""
+    registry = tmp_path / "templates.json"
+    registry.write_text(json.dumps([{
+        "id": "old1",
+        "name": "Old Template",
+        "slides_id": "slides1",
+        "variable_label": "Competitor",
+        "variable_hint": "Acme",
+        "slides": [{"number": 1, "title": "Intro", "enabled": True}],
+    }]))
+
+    loaded = load_templates(str(registry))
+
+    assert loaded[0].id == "old1"
+    assert loaded[0].template_dna is None
+    assert loaded[0].confluence_spaces == []

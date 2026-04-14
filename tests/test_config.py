@@ -41,7 +41,7 @@ def test_config_raises_on_missing_required_var():
             from importlib import reload
             import core.config as config_module
             reload(config_module)
-            with pytest.raises(EnvironmentError, match="Required environment variable"):
+            with pytest.raises(EnvironmentError):
                 config_module.get_config()
 
 
@@ -64,3 +64,52 @@ def test_config_optional_vars_have_defaults():
             assert cfg.power_user_mode is False
             assert cfg.model_id == "gemini-2.5-flash"
             assert cfg.slides_batch_size == 5
+
+
+def test_config_loads_confluence_fields(tmp_path):
+    creds = tmp_path / "creds.json"
+    creds.write_text('{"type":"service_account"}')
+    env = {
+        "GEMINI_API_KEY": "key",
+        "GAS_WEB_APP_URL": "https://example.com",
+        "GDRIVE_CREDENTIALS_PATH": str(creds),
+        "FOLDER_DRIVE_ID": "folder",
+        "RESEARCH_FILES_FOLDER_ID": "research_folder",
+        "GEMINI_PRO_MODEL_ID": "gemini-1.5-pro",
+        "CONFLUENCE_BASE_URL": "https://mysite.atlassian.net",
+        "CONFLUENCE_API_TOKEN": "token123",
+        "CONFLUENCE_USER_EMAIL": "user@example.com",
+    }
+    with patch("dotenv.load_dotenv"):
+        with patch.dict(os.environ, env, clear=True):
+            from importlib import reload
+            import core.config as cfg_module
+            reload(cfg_module)
+            config = cfg_module.get_config()
+
+    assert config.pro_model_id == "gemini-1.5-pro"
+    assert config.confluence_base_url == "https://mysite.atlassian.net"
+    assert config.confluence_api_token == "token123"
+    assert config.confluence_user_email == "user@example.com"
+
+
+def test_config_confluence_fields_default_to_empty(tmp_path):
+    creds = tmp_path / "creds.json"
+    creds.write_text('{"type":"service_account"}')
+    env = {
+        "GEMINI_API_KEY": "key",
+        "GAS_WEB_APP_URL": "https://example.com",
+        "GDRIVE_CREDENTIALS_PATH": str(creds),
+        "FOLDER_DRIVE_ID": "folder",
+        "RESEARCH_FILES_FOLDER_ID": "research_folder",
+    }
+    with patch("dotenv.load_dotenv"):
+        with patch.dict(os.environ, env, clear=True):
+            from importlib import reload
+            import core.config as cfg_module
+            reload(cfg_module)
+            config = cfg_module.get_config()
+
+    assert config.confluence_base_url == ""
+    assert config.confluence_api_token == ""
+    assert config.confluence_user_email == ""

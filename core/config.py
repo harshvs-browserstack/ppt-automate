@@ -61,6 +61,10 @@ class Config:
     power_user_mode: bool = False
     google_service_account_email: str = ""
     history_sheet_id: str = ""  # Optional: Google Sheet to log all generations
+    pro_model_id: str = "gemini-1.5-pro"
+    confluence_base_url: str = ""
+    confluence_api_token: str = ""
+    confluence_user_email: str = ""
 
 
 def get_config() -> Config:
@@ -119,4 +123,8 @@ def get_config() -> Config:
         power_user_mode=os.getenv("POWER_USER_MODE", "").lower() == "true",
         google_service_account_email=os.getenv("GOOGLE_SERVICE_ACCOUNT_EMAIL", ""),
         history_sheet_id=os.getenv("HISTORY_SHEET_ID", ""),
+        pro_model_id=os.getenv("GEMINI_PRO_MODEL_ID", "gemini-1.5-pro"),
+        confluence_base_url=os.getenv("CONFLUENCE_BASE_URL", ""),
+        confluence_api_token=os.getenv("CONFLUENCE_API_TOKEN", ""),
+        confluence_user_email=os.getenv("CONFLUENCE_USER_EMAIL", ""),
     )
