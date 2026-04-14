@@ -157,15 +157,29 @@ if st.session_state.app_state == "input":
                 st.session_state.pdf_bytes = suggest_pdf.read()
                 st.session_state.pdf_filename = suggest_pdf.name
                 st.caption("Usually takes 5–10 seconds")
-                with st.spinner("Finding the right template..."):
-                    result = suggest_template(
-                        description=description.strip(),
-                        templates=templates,
-                        api_key=config.gemini_api_key,
-                        model_id=config.model_id,
-                    )
-                st.session_state.suggest_result = result
-                st.rerun()
+                try:
+                    with st.spinner("Finding the right template..."):
+                        result = suggest_template(
+                            description=description.strip(),
+                            templates=templates,
+                            api_key=config.gemini_api_key,
+                            model_id=config.model_id,
+                        )
+                    st.session_state.suggest_result = result
+                    st.rerun()
+                except Exception as e:
+                    # Roll back stored PDF so the user can try again cleanly
+                    st.session_state.pdf_bytes = None
+                    st.session_state.pdf_filename = None
+                    msg = str(e)
+                    if "503" in msg or "UNAVAILABLE" in msg:
+                        st.error("Gemini is under high demand right now. Please wait a moment and try again.")
+                    elif "401" in msg or "403" in msg or "API_KEY" in msg.upper():
+                        st.error("API key error — check that GEMINI_API_KEY is set correctly in your secrets.")
+                    elif "429" in msg or "RESOURCE_EXHAUSTED" in msg:
+                        st.error("Rate limit reached. Please wait a minute and try again.")
+                    else:
+                        st.error(f"Could not reach the AI service: {e}")
 
         # Show suggestion result card
         if st.session_state.suggest_result:
