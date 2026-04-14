@@ -177,7 +177,8 @@ async def _generate_for_slide_async(
     max_retries: int = 3,
 ) -> Tuple[int, List[Dict], pd.DataFrame]:
     """Generate content for a single slide asynchronously using Gemini.
-    Retries on transient 503/429 errors with exponential backoff.
+    Retries on 429/RESOURCE_EXHAUSTED with exponential backoff.
+    503/UNAVAILABLE is propagated immediately so the user can retry.
     """
     prompt_text = create_slide_generation_prompt(
         slide_elements_json=slide_df.to_dict("records"),
@@ -196,8 +197,8 @@ async def _generate_for_slide_async(
         except Exception as e:
             last_exc = e
             msg = str(e)
-            # Retry only on transient overload / rate-limit errors
-            if "503" in msg or "429" in msg or "UNAVAILABLE" in msg or "RESOURCE_EXHAUSTED" in msg:
+            # Retry only on rate-limit errors; 503/UNAVAILABLE surfaces to the user
+            if "429" in msg or "RESOURCE_EXHAUSTED" in msg:
                 wait = 5 * (2 ** attempt)  # 5s, 10s, 20s
                 print(f"   -> Slide {slide_number} transient error (attempt {attempt + 1}/{max_retries}), retrying in {wait}s: {e}")
                 await asyncio.sleep(wait)
@@ -392,6 +393,9 @@ async def run_ai_content_population(
                     batch_results = await asyncio.gather(*tasks, return_exceptions=True)
                     for slide_num, result in zip(batch, batch_results):
                         if isinstance(result, Exception):
+                            err_msg = str(result)
+                            if "503" in err_msg or "UNAVAILABLE" in err_msg:
+                                raise result  # Abort — let the user retry
                             print(f"   -> Slide {slide_num} failed after retries, using original content: {result}")
                             all_ai_results[slide_num] = slide_groups.get_group(slide_num).to_dict("records")
                         else:

@@ -1,5 +1,6 @@
 # app.py
 import asyncio
+import json
 import os
 import pathlib
 import streamlit as st
@@ -269,7 +270,14 @@ elif st.session_state.app_state == "loading":
         st.rerun()
 
     except Exception as e:
-        st.session_state.error_msg = f"Pipeline failed: {e}"
+        raw = str(e)
+        try:
+            # Try to surface just the human-readable message from API error JSON
+            parsed = json.loads(raw)
+            display = parsed.get("error", {}).get("message") or raw
+        except (json.JSONDecodeError, AttributeError):
+            display = raw
+        st.session_state.error_msg = display
         st.session_state.app_state = "input"
         st.rerun()
 
