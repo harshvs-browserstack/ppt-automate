@@ -169,27 +169,65 @@ if st.session_state.app_state == "input":
 
         # Show suggestion result card
         if st.session_state.suggest_result:
+            import time
             r = st.session_state.suggest_result
             suggested_t = get_template_by_id(templates, r.template_id)
             if suggested_t:
-                st.markdown(
-                    f'<div class="suggestion-card">'
-                    f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-                    f'<span style="background:#059669;color:#fff;font-size:0.65rem;font-weight:700;'
-                    f'padding:2px 8px">✦ Suggested</span>'
-                    f'<strong style="color:#111827">{suggested_t.name}</strong>'
-                    f'</div>'
-                    f'<p style="font-size:0.8rem;color:#6B7280;margin-bottom:0">{r.reason}</p>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-                col_use, col_pick = st.columns([3, 1])
-                if col_use.button(f"Use {suggested_t.name} →", key="btn_use_suggestion", type="primary", use_container_width=True):
+                if r.extracted_target:
+                    # Happy path — auto-proceed
+                    st.markdown(
+                        f'<div class="suggestion-card">'
+                        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+                        f'<span style="background:#059669;color:#fff;font-size:0.65rem;font-weight:700;'
+                        f'padding:2px 8px">✦ Auto-selected</span>'
+                        f'<strong style="color:#111827">{suggested_t.name}</strong>'
+                        f'</div>'
+                        f'<p style="font-size:0.8rem;color:#6B7280;margin-bottom:4px">{r.reason}</p>'
+                        f'<p style="font-size:0.75rem;color:#059669;margin-bottom:0">'
+                        f'Target extracted: <strong>{r.extracted_target}</strong> · Starting generation…'
+                        f'</p>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+                    time.sleep(1.5)
                     _select_template(r.template_id, r.extracted_target)
-                    st.rerun()
-                if col_pick.button("Pick another", key="btn_pick_another", use_container_width=True):
                     st.session_state.suggest_result = None
+                    st.session_state.app_state = "loading"
                     st.rerun()
+                else:
+                    # Missing target — pause and prompt
+                    st.markdown(
+                        f'<div class="suggestion-card">'
+                        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+                        f'<span style="background:#059669;color:#fff;font-size:0.65rem;font-weight:700;'
+                        f'padding:2px 8px">✦ Suggested</span>'
+                        f'<strong style="color:#111827">{suggested_t.name}</strong>'
+                        f'</div>'
+                        f'<p style="font-size:0.8rem;color:#6B7280;margin-bottom:0">{r.reason}</p>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+                    st.markdown(
+                        f'<div class="section-label">{suggested_t.variable_label}</div>',
+                        unsafe_allow_html=True,
+                    )
+                    missing_target = st.text_input(
+                        label="",
+                        placeholder=suggested_t.variable_hint,
+                        key="missing_target_input",
+                    )
+                    col_gen, col_pick = st.columns([3, 1])
+                    if col_gen.button("Generate →", key="btn_gen_missing", type="primary", use_container_width=True):
+                        if not missing_target.strip():
+                            st.error(f"Please enter {suggested_t.variable_label}.")
+                        else:
+                            _select_template(r.template_id, missing_target.strip())
+                            st.session_state.suggest_result = None
+                            st.session_state.app_state = "loading"
+                            st.rerun()
+                    if col_pick.button("Try again", key="btn_pick_another", use_container_width=True):
+                        st.session_state.suggest_result = None
+                        st.rerun()
 
     # ── Template row ───────────────────────────────────────────────────────
     st.markdown('<div class="section-label">Template</div>', unsafe_allow_html=True)
