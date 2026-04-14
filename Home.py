@@ -279,12 +279,20 @@ if st.session_state.app_state == "input":
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # ── PDF Upload ─────────────────────────────────────────────────────
-        st.markdown('<div class="section-label">Research PDF</div>', unsafe_allow_html=True)
-        uploaded_file = st.file_uploader(
-            label="",
-            type=["pdf"],
-        )
+        # ── PDF Upload (only for Custom Build — Quick Generate captures PDF earlier) ──
+        if not st.session_state.pdf_bytes:
+            st.markdown('<div class="section-label">Research PDF</div>', unsafe_allow_html=True)
+            uploaded_file = st.file_uploader(
+                label="",
+                type=["pdf"],
+            )
+        else:
+            uploaded_file = None
+            st.markdown(
+                f'<div style="font-size:0.8rem;color:#059669;margin-bottom:0.5rem">'
+                f'✓ PDF ready: {st.session_state.pdf_filename}</div>',
+                unsafe_allow_html=True,
+            )
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -293,13 +301,14 @@ if st.session_state.app_state == "input":
             st.session_state.error_msg = None
 
         if st.button("Generate Deck →", type="primary", use_container_width=True):
-            if not uploaded_file:
+            if not st.session_state.pdf_bytes and not uploaded_file:
                 st.error("Please upload a PDF before generating.")
             elif not target.strip():
                 st.error(f"Please enter {selected_template.variable_label}.")
             else:
-                st.session_state.pdf_bytes = uploaded_file.read()
-                st.session_state.pdf_filename = uploaded_file.name
+                if uploaded_file:
+                    st.session_state.pdf_bytes = uploaded_file.read()
+                    st.session_state.pdf_filename = uploaded_file.name
                 st.session_state.target = target.strip()
                 st.session_state.app_state = "loading"
                 st.rerun()
