@@ -174,6 +174,7 @@ async def _generate_for_slide_async(
     model_id: str,
     competitor: str,
     template_view_pdf_name: str,
+    template_context: str = "",
     max_retries: int = 3,
 ) -> Tuple[int, List[Dict], pd.DataFrame]:
     """Generate content for a single slide asynchronously using Gemini.
@@ -184,6 +185,7 @@ async def _generate_for_slide_async(
         slide_elements_json=slide_df.to_dict("records"),
         competitor=competitor,
         template_view_pdf_name=template_view_pdf_name,
+        template_context=template_context,
     )
     last_exc = None
     for attempt in range(max_retries):
@@ -213,14 +215,16 @@ async def _generate_for_slide_async(
 
 
 async def run_ai_content_population(
-    pdf_bytes: bytes,
-    pdf_filename: str,
     competitor: str,
     config: Config,
+    pdf_bytes: Optional[bytes] = None,
+    pdf_filename: Optional[str] = None,
+    research_md_content: Optional[str] = None,
     slides_id: Optional[str] = None,
     excluded_slide_numbers: Optional[List[int]] = None,
     template_view_pdf_name: Optional[str] = None,
     template_name: Optional[str] = None,
+    template_dna_context: str = "",
     on_status: Optional[Callable[[str, float, Optional[str]], None]] = None,
 ) -> str:
     """
@@ -247,17 +251,25 @@ async def run_ai_content_population(
     Raises:
         Exception: If any stage of the pipeline fails
     """
+    if not pdf_bytes and not research_md_content:
+        raise ValueError("At least one of pdf_bytes or research_md_content must be provided.")
     if excluded_slide_numbers is None:
         excluded_slide_numbers = []
     if template_view_pdf_name is None:
-        template_view_pdf_name = pdf_filename
+        template_view_pdf_name = pdf_filename or "research.md"
 
-    # Create temp file for PDF
     temp_pdf = None
+    temp_md = None
     try:
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-            tmp.write(pdf_bytes)
-            temp_pdf = tmp.name
+        if pdf_bytes:
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+                tmp.write(pdf_bytes)
+                temp_pdf = tmp.name
+
+        if research_md_content:
+            with tempfile.NamedTemporaryFile(suffix=".md", delete=False, mode="w", encoding="utf-8") as tmp:
+                tmp.write(research_md_content)
+                temp_md = tmp.name
 
         # Initialize clients
         client_genai = genai.Client(api_key=config.gemini_api_key)
@@ -338,13 +350,34 @@ async def run_ai_content_population(
             if on_status:
                 on_status("Uploading & preparing...", 0.32)
             print("[4/6] Uploading documents and loading style map...")
-            uploaded_files = _upload_and_wait_for_files(client_genai, [temp_pdf])
-            context_files = [
-                types.Part.from_uri(
-                    file_uri=f.uri,
-                    mime_type="application/pdf"
-                ) for f in uploaded_files
-            ]
+            context_files = []
+
+            # Upload research Markdown as primary context (if provided)
+            if temp_md:
+                md_files = []
+                f = client_genai.files.upload(
+                    file=temp_md, config={"mime_type": "text/plain"}
+                )
+                md_files.append(f)
+                print("   -> Waiting for research file to become ACTIVE...")
+                for i, mf in enumerate(md_files):
+                    while mf.state.name == "PROCESSING":
+                        time.sleep(2)
+                        mf = client_genai.files.get(name=mf.name)
+                    md_files[i] = mf
+                context_files += [
+                    types.Part.from_uri(file_uri=mf.uri, mime_type="text/plain")
+                    for mf in md_files
+                ]
+
+            # Upload supplementary PDF (if provided)
+            if temp_pdf:
+                pdf_uploaded = _upload_and_wait_for_files(client_genai, [temp_pdf])
+                context_files += [
+                    types.Part.from_uri(file_uri=f.uri, mime_type="application/pdf")
+                    for f in pdf_uploaded
+                ]
+
             print("   -> Files uploaded and ACTIVE.")
 
             # Load style map via GAS proxy (avoids service account Drive permission requirement)
@@ -387,6 +420,7 @@ async def run_ai_content_population(
                             model_id=config.model_id,
                             competitor=competitor,
                             template_view_pdf_name=template_view_pdf_name,
+                            template_context=template_dna_context,
                         )
                         tasks.append(task)
 
@@ -501,7 +535,9 @@ async def run_ai_content_population(
             return final_url
 
     finally:
-        # Clean up temp file
         if temp_pdf and os.path.exists(temp_pdf):
             os.remove(temp_pdf)
-            print(f"   -> Cleaned up temp file: {temp_pdf}")
+            print(f"   -> Cleaned up temp PDF: {temp_pdf}")
+        if temp_md and os.path.exists(temp_md):
+            os.remove(temp_md)
+            print(f"   -> Cleaned up temp MD: {temp_md}")

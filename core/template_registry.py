@@ -3,7 +3,7 @@
 import json
 import pathlib
 import secrets
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import List, Optional
 
 
@@ -16,6 +16,18 @@ class SlideDefault:
 
 
 @dataclass
+class TemplateDNA:
+    """Structured understanding of a template's purpose and information needs.
+    Generated once via Gemini Pro analysis of the slide deck PDF.
+    Drives both research retrieval and slide generation context.
+    """
+    purpose: str
+    dimensions: List[str]
+    tone: str
+    source_guidance: str
+
+
+@dataclass
 class Template:
     """Represents a reusable presentation template."""
     id: str
@@ -24,6 +36,10 @@ class Template:
     variable_label: str
     variable_hint: str
     slides: List[SlideDefault]
+    template_dna: Optional[TemplateDNA] = None
+    confluence_spaces: List[str] = field(default_factory=list)
+    search_labels: List[str] = field(default_factory=list)
+    research_drive_folder_id: str = ""
 
 
 REGISTRY_PATH = pathlib.Path(__file__).parent.parent / "templates.json"
@@ -51,6 +67,15 @@ def load_templates(registry_path: str) -> List[Template]:
     templates = []
     for item in data:
         slides = [SlideDefault(**slide) for slide in item["slides"]]
+        dna_data = item.get("template_dna")
+        template_dna = None
+        if dna_data:
+            template_dna = TemplateDNA(
+                purpose=dna_data["purpose"],
+                dimensions=dna_data["dimensions"],
+                tone=dna_data["tone"],
+                source_guidance=dna_data["source_guidance"],
+            )
         template = Template(
             id=item["id"],
             name=item["name"],
@@ -58,6 +83,10 @@ def load_templates(registry_path: str) -> List[Template]:
             variable_label=item["variable_label"],
             variable_hint=item["variable_hint"],
             slides=slides,
+            template_dna=template_dna,
+            confluence_spaces=item.get("confluence_spaces", []),
+            search_labels=item.get("search_labels", []),
+            research_drive_folder_id=item.get("research_drive_folder_id", ""),
         )
         templates.append(template)
 
@@ -83,6 +112,10 @@ def save_templates(templates: List[Template], registry_path: str) -> None:
             "variable_label": template.variable_label,
             "variable_hint": template.variable_hint,
             "slides": [asdict(slide) for slide in template.slides],
+            "template_dna": asdict(template.template_dna) if template.template_dna else None,
+            "confluence_spaces": template.confluence_spaces,
+            "search_labels": template.search_labels,
+            "research_drive_folder_id": template.research_drive_folder_id,
         }
         data.append(item)
 

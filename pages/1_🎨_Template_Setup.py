@@ -9,6 +9,7 @@ from core.template_registry import (
     Template, SlideDefault, load_templates, save_templates,
     get_template_by_id, new_template_id, REGISTRY_PATH,
 )
+from core.template_dna import generate_template_dna
 from core.slides_helpers import fetch_slide_titles
 import re
 import pathlib
@@ -40,6 +41,12 @@ if "var_label_input" not in st.session_state:
     st.session_state.var_label_input = ""
 if "var_hint_input" not in st.session_state:
     st.session_state.var_hint_input = ""
+if "confluence_spaces_input" not in st.session_state:
+    st.session_state.confluence_spaces_input = ""
+if "search_labels_input" not in st.session_state:
+    st.session_state.search_labels_input = ""
+if "research_drive_folder_input" not in st.session_state:
+    st.session_state.research_drive_folder_input = ""
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────
@@ -88,6 +95,9 @@ if templates:
             st.session_state.slides_url_input = t.slides_id
             st.session_state.var_label_input = t.variable_label
             st.session_state.var_hint_input = t.variable_hint
+            st.session_state.confluence_spaces_input = ", ".join(t.confluence_spaces)
+            st.session_state.search_labels_input = ", ".join(t.search_labels)
+            st.session_state.research_drive_folder_input = t.research_drive_folder_id
             st.rerun()
         if col_delete.button("🗑️", key=f"delete_{t.id}", use_container_width=True):
             # Remove template and save
@@ -114,6 +124,9 @@ with col_new:
             st.session_state.slides_url_input = ""
             st.session_state.var_label_input = ""
             st.session_state.var_hint_input = ""
+            st.session_state.confluence_spaces_input = ""
+            st.session_state.search_labels_input = ""
+            st.session_state.research_drive_folder_input = ""
             st.rerun()
 
 template_name = st.text_input(
@@ -180,6 +193,51 @@ if st.session_state.setup_slides_loaded:
 
 st.markdown('<div style="height:1.5rem"></div>', unsafe_allow_html=True)
 
+# ── Research Sources ────────────────────────────────────────────────────────
+st.markdown('<div class="section-label">Research Sources</div>', unsafe_allow_html=True)
+st.caption("Configure where the research agent searches for source material.")
+
+confluence_spaces_raw = st.text_input(
+    "Confluence Space Keys (comma-separated)",
+    placeholder="CI, PROD, MKTG",
+    help="Space keys to search for research. Find these in your Confluence space URL.",
+    key="confluence_spaces_input",
+)
+search_labels_raw = st.text_input(
+    "Search Labels (optional, comma-separated)",
+    placeholder="battlecard, competitor",
+    help="Confluence page labels to narrow search results.",
+    key="search_labels_input",
+)
+research_drive_folder_id = st.text_input(
+    "Research Output Folder (Google Drive ID)",
+    placeholder="1PyOr7...",
+    help="Google Drive folder where research files will be saved.",
+    key="research_drive_folder_input",
+)
+
+# Show existing DNA if present
+if editing and editing.template_dna:
+    with st.expander("Template DNA (auto-generated)", expanded=False):
+        st.write(f"**Purpose:** {editing.template_dna.purpose}")
+        st.write("**Dimensions:**")
+        for dim in editing.template_dna.dimensions:
+            st.write(f"  - {dim}")
+        st.write(f"**Tone:** {editing.template_dna.tone}")
+        if st.button("Regenerate DNA"):
+            with st.spinner("Regenerating Template DNA..."):
+                try:
+                    editing.template_dna = generate_template_dna(editing.slides_id, config)
+                    updated_templates = load_templates(REGISTRY_PATH)
+                    updated_list = [editing if t.id == editing.id else t for t in updated_templates]
+                    save_templates(updated_list, REGISTRY_PATH)
+                    st.success("Template DNA regenerated.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"DNA generation failed: {e}")
+
+st.markdown('<div style="height:1.5rem"></div>', unsafe_allow_html=True)
+
 # ── Save ───────────────────────────────────────────────────────────────────
 _, col_save = st.columns([1, 4])  # Right-align the button
 with col_save:
@@ -202,6 +260,9 @@ with col_save:
                 )
                 for s in st.session_state.setup_slides_loaded
             ]
+            confluence_spaces = [s.strip() for s in confluence_spaces_raw.split(",") if s.strip()]
+            search_labels = [s.strip() for s in search_labels_raw.split(",") if s.strip()]
+
             new_t = Template(
                 id=editing.id if editing else new_template_id(),
                 name=template_name.strip(),
@@ -209,12 +270,27 @@ with col_save:
                 variable_label=variable_label.strip(),
                 variable_hint=variable_hint.strip(),
                 slides=slide_defaults,
+                # Preserve existing DNA if editing; will be generated/regenerated below
+                template_dna=editing.template_dna if editing else None,
+                confluence_spaces=confluence_spaces,
+                search_labels=search_labels,
+                research_drive_folder_id=research_drive_folder_id.strip(),
             )
             # Replace or append
             updated = [new_t if t.id == new_t.id else t for t in templates]
             if new_t.id not in {t.id for t in templates}:
                 updated.append(new_t)
             save_templates(updated, REGISTRY_PATH)
+
+            # Generate Template DNA if not already present
+            if not new_t.template_dna and slides_id:
+                with st.spinner("Generating Template DNA with Gemini Pro (one-time setup)..."):
+                    try:
+                        new_t.template_dna = generate_template_dna(slides_id, config)
+                        updated_with_dna = [new_t if t.id == new_t.id else t for t in load_templates(REGISTRY_PATH)]
+                        save_templates(updated_with_dna, REGISTRY_PATH)
+                    except Exception as e:
+                        st.warning(f"Template DNA generation failed: {e}. You can regenerate it from the edit view.")
 
             # Show success banner at top
             success_banner.markdown(
@@ -235,6 +311,9 @@ with col_save:
             st.session_state.slides_url_input = ""
             st.session_state.var_label_input = ""
             st.session_state.var_hint_input = ""
+            st.session_state.confluence_spaces_input = ""
+            st.session_state.search_labels_input = ""
+            st.session_state.research_drive_folder_input = ""
 
             # Clear banner after 2 seconds
             import time
