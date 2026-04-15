@@ -35,6 +35,8 @@ defaults = {
     "suggest_mode": False,
     "suggest_result": None,      # SuggestionResult or None
     "auto_filled_target": False,
+    "research_md": None,         # Research Markdown content from the research agent
+    "research_drive_url": None,  # Drive URL of the uploaded research file
 }
 for key, val in defaults.items():
     if key not in st.session_state:
@@ -51,6 +53,39 @@ def _select_template(template_id: str, target: str = None):
         st.session_state.auto_filled_target = True
     else:
         st.session_state.auto_filled_target = False
+
+
+def _run_research_step(template, target: str) -> tuple:
+    """Run the B-Lite research agent synchronously. Returns (md_content, drive_url)."""
+    from core.confluence_client import ConfluenceClient
+    from core.research_agent import run_search, synthesise_research, build_research_markdown, upload_research_file, research_filename
+
+    if not config.confluence_base_url or not config.confluence_api_token:
+        raise ValueError("CONFLUENCE_BASE_URL and CONFLUENCE_API_TOKEN must be set.")
+
+    with ConfluenceClient(config.confluence_base_url, config.confluence_user_email, config.confluence_api_token) as client:
+        bundle = run_search(
+            template_dna=template.template_dna,
+            target=target,
+            confluence_spaces=template.confluence_spaces,
+            search_labels=template.search_labels,
+            confluence_client=client,
+            template_name=template.name,
+        )
+
+    body = synthesise_research(bundle, config)
+    md_content = build_research_markdown(body, bundle)
+
+    drive_url = ""
+    if template.research_drive_folder_id:
+        filename = research_filename(target, template.name)
+        drive_url = upload_research_file(
+            content=md_content,
+            filename=filename,
+            folder_id=template.research_drive_folder_id,
+            credentials_path=config.gdrive_credentials_path,
+        )
+    return md_content, drive_url, bundle
 
 
 # ── State: INPUT ───────────────────────────────────────────────────────────
@@ -194,8 +229,17 @@ if st.session_state.app_state == "input":
 
         st.markdown("<br>", unsafe_allow_html=True)
 
+        # ── Research preview (shown if research was already run) ───────────
+        has_research = bool(st.session_state.research_md)
+        if has_research:
+            with st.expander("Research File Preview", expanded=False):
+                st.markdown(st.session_state.research_md)
+                if st.session_state.research_drive_url:
+                    st.markdown(f"[View in Google Drive]({st.session_state.research_drive_url})")
+
         # ── PDF Upload ─────────────────────────────────────────────────────
-        st.markdown('<div class="section-label">Research PDF</div>', unsafe_allow_html=True)
+        pdf_label = "Supplementary PDF (optional)" if has_research else "Research PDF"
+        st.markdown(f'<div class="section-label">{pdf_label}</div>', unsafe_allow_html=True)
         uploaded_file = st.file_uploader(
             label="",
             type=["pdf"],
@@ -207,14 +251,42 @@ if st.session_state.app_state == "input":
             st.error(st.session_state.error_msg)
             st.session_state.error_msg = None
 
+        can_generate = bool(target.strip()) and (uploaded_file is not None or has_research)
+
+        # Research button — shown when template has DNA + Confluence spaces configured
+        has_confluence = (
+            selected_template and
+            selected_template.template_dna and
+            selected_template.confluence_spaces
+        )
+        if has_confluence:
+            if st.button("Search Confluence →", use_container_width=True):
+                if not target.strip():
+                    st.error(f"Please enter {selected_template.variable_label} before searching.")
+                else:
+                    with st.spinner("Searching Confluence for research..."):
+                        try:
+                            md_content, drive_url, bundle = _run_research_step(selected_template, target.strip())
+                            st.session_state.research_md = md_content
+                            st.session_state.research_drive_url = drive_url
+                            # Surface gap warnings
+                            if bundle.unfilled_dimensions:
+                                st.warning(f"No sources found for: {', '.join(bundle.unfilled_dimensions)}. Consider uploading a supplementary PDF.")
+                            else:
+                                st.success(f"Research complete — {len(bundle.pages)} pages found across {len(bundle.template_dna.dimensions)} dimensions.")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Research failed: {e}")
+
         if st.button("Generate Deck →", type="primary", use_container_width=True):
-            if not uploaded_file:
-                st.error("Please upload a PDF before generating.")
-            elif not target.strip():
+            if not target.strip():
                 st.error(f"Please enter {selected_template.variable_label}.")
+            elif not can_generate:
+                st.error("Please upload a PDF or run the Confluence research before generating.")
             else:
-                st.session_state.pdf_bytes = uploaded_file.read()
-                st.session_state.pdf_filename = uploaded_file.name
+                if uploaded_file:
+                    st.session_state.pdf_bytes = uploaded_file.read()
+                    st.session_state.pdf_filename = uploaded_file.name
                 st.session_state.target = target.strip()
                 st.session_state.app_state = "loading"
                 st.rerun()
@@ -247,15 +319,22 @@ elif st.session_state.app_state == "loading":
         slides_id = selected_template.slides_id if selected_template else config.original_slides_id
         excluded = get_excluded_slide_numbers(selected_template) if selected_template else []
 
+        dna_context = ""
+        if selected_template and selected_template.template_dna:
+            dna = selected_template.template_dna
+            dna_context = f"{dna.purpose} Tone: {dna.tone}"
+
         final_url = asyncio.run(
             run_ai_content_population(
                 competitor=st.session_state.target,
                 config=config,
                 pdf_bytes=st.session_state.pdf_bytes,
                 pdf_filename=st.session_state.pdf_filename,
+                research_md_content=st.session_state.research_md,
                 slides_id=slides_id,
                 excluded_slide_numbers=excluded,
                 template_name=selected_template.name if selected_template else None,
+                template_dna_context=dna_context,
                 on_status=on_status,
             )
         )
@@ -266,6 +345,8 @@ elif st.session_state.app_state == "loading":
 
         st.session_state.final_url = final_url
         st.session_state.app_state = "success"
+        st.session_state.research_md = None
+        st.session_state.research_drive_url = None
         invalidate_history_cache()  # Clear history cache so next view gets fresh data
         st.rerun()
 
